@@ -1,0 +1,18 @@
+1. 형상관리 시스템은 왜 나왔을까? 
+ 소프트웨어 개발 및 유지보수 과정에서 나오는 변경사항들을 체계적으로 추적하고 통제하기 위해 나왔다.
+
+2. git은 어떤 형상관리 시스템이고 어떤 특징을 가지고 있는가? 분산형 형상관리 시스템이란?
+  git은 분산형 형상관리 시스템으로 로컬pc에서 commit을 하면 로컬 저장소에 반영이 되고 로컬저장소에 push하면 원격저장소에 반영이 되는 특징을 가진다.
+  분산형 형상관리 시스템은 클라이언트가 파일들의 마지막 스냅샷을 가져오는 대신 저장소를 통째로 복제한다.
+
+3. git과 GitHub은 어떻게 다를까요?
+ git은 로컬에서 관리되는 형상관리 시스템이고, github는 git에서 관리하는 데이터들을 저장하는 곳이다.(클라우드 방식으로 관리되는 형상관리 시스템)
+
+4. git의 clone/add/commit/push/pull/branch/stash 명령은 무엇이며 어떨 때 이용하나요? 그리고 어떻게 사용하나요?
+ clone : 복사해서 자신의 로컬에 저장하는 커맨드이다. 예시) git clone https://github.com/puddingii/WebDevCurriculum.git
+ add : 변경사항들을 스테이징 영역에 추가하는 커맨드이다. 예시) git add -A (모두다 저장)
+ commit : git add로 저장해놓은 데이터들을 커밋함. 예시) git commit -m "변경사항1저장"
+ push : 변경사항들을 공유하고 싶을 때 사용하는 커맨드. 예시) git push origin master
+ pull : fetch와 merge를 합성한 것으로 clone한 이후에 수정된 것을 모두 가져오고 merge를 사용해 합한 것이다. 예시) git pull origin master(git pull 원격져장소명 branch명)
+ branch : 메인줄기에서 가지가 뻗쳐나가는 것으로 메인코드에서 독립적으로 개발하기 위한 것이다. 예시) git branch branch111
+ stash : 커밋하지 않고 변경사항을 저장하는 커맨드.(예시로 커밋하지 않고 수정중이다가 핫픽스요청으로 다른 것을 수정해야할 때 사용) 예시) git stash
