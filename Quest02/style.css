@@ -1,0 +1,164 @@
+body {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(white 25%, rgb(194, 220, 255), 50%,white);
+}
+
+header, section, footer {
+    text-align: center;
+}
+
+header {
+    margin-bottom: 150px;
+}
+
+input {
+    width:500px;
+    height:30px;
+    border: 1px solid rgb(47, 238, 41);
+}
+
+.searchForm {
+    position: relative;
+}
+
+.searchIcons {
+    position: absolute;
+    display:inline;
+    margin-left:-110px;
+    padding-top:1px;
+    justify-content: right;
+}
+
+.searchIcon {
+    width:30px;
+    height: 30px;
+}
+
+.bookmarks {
+    width:450px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 100px);
+    
+}
+
+.bookmark {
+    width:50px;
+    height:50px;
+}
+
+.infoForm {
+    background-color: white;
+    border: 1px solid white;
+    border-radius: 5px;
+    width: 30%;
+    margin: 0 auto;
+    margin-bottom: 10px;
+    padding: 12px 8px;
+}
+
+.weatherToday {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    flex-direction: row;
+    font-size: 12px;
+    text-align: left;
+    align-items: center;
+}
+
+.weatherWeekly {
+    text-align: left;
+    font-size: 13px;
+}
+
+.weatherWeekly button {
+    background-color: rgb(217, 226, 235);
+    border: none;
+    padding: 4px 2px;
+    font-size: 9px;
+}
+
+.weatherButton {
+    margin: 12px 3px;
+}
+
+.weathersDetail {
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+}
+
+.weathersDetail div{
+    margin: 0 auto;
+}
+
+.ad, .cartoon {
+    display: flex;
+    flex-direction: row;
+    justify-content:space-between;
+    font-size: 10px;
+}
+
+.ad button {
+    border: 1px solid rgb(107, 139, 243);
+    background-color: white;
+    color:rgb(107, 139, 243);
+    font-size: 10px;
+    padding: 0px 3px;
+}
+
+.cartoon p{
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+.vaccine {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    font-size: 12px;
+}
+
+.vaccine div {
+    margin-right:50px;
+}
+
+.holiday {
+    font-size: 12px;
+}
+
+.cartoon button {
+    background-color: white;
+    border: none;
+}
+
+.othersGuide {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+    font-size: 14px;
+}
+
+.othersButtons {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: center;
+}
+
+.othersButtons button {
+    background-color: rgb(223, 223, 223);
+    border: white solid 1px;
+    padding: 10px 20px;
+    width: 200px;
+    margin: 0 auto;
+}
+
+.guide {
+    text-align: left;
+}
