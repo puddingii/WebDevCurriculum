@@ -1,6 +1,6 @@
 let value = prompt();
 
-const drawStar = (end, idx) => {
+const setStar = (end, idx) => {
     let str = ""
     for(i = 0; i < end; i+=1) {
         str += idx;
@@ -10,8 +10,8 @@ const drawStar = (end, idx) => {
 
 for(let i = 1; i <= value; i+=1) {
     let str = ""
-    str += drawStar(value - i, " ");
-    str += drawStar(i*2-1, "*");
+    str += setStar(value - i, " ");
+    str += setStar(i*2-1, "*");
 
     console.log(str);
 }
