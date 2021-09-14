@@ -20,6 +20,7 @@ input {
 
 .searchForm {
     position: relative;
+    margin-bottom: 10px;
 }
 
 .searchIcons {
@@ -36,14 +37,26 @@ input {
 }
 
 .bookmarks {
-    width:450px;
+    width:400px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: repeat(4, 100px);
-    
+}
+
+.bookmarks a {
+    text-decoration: none;
+}
+
+.bookmarks a:visited {
+    color: black;
 }
 
 .bookmark {
+    width:50px;
+    height:50px;
+}
+
+.liveStream img {
     width:50px;
     height:50px;
 }
@@ -157,6 +170,7 @@ input {
     padding: 10px 20px;
     width: 200px;
     margin: 0 auto;
+    text-align: left;
 }
 
 .guide {
