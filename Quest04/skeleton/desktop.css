@@ -14,9 +14,13 @@ p {
 }
 
 .drag {
+    display: flex;
+    flex-direction: column;
     position: absolute;
     width: 70px;
-    height: 70px;
+    height: 90px;
+    justify-content: center;
+    align-items: center;
 }
 
 .newContent {

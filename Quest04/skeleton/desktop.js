@@ -84,13 +84,13 @@ class Window {
 		const childs = []
 		for(let i of this.#icons.concat(this.#folders)) {
 			const div = this.buildIcon(i);
-			this.setDragMotion(div);
+			this.setDragMotion(div,1);
 			if(i instanceof Folder) {
 				const handleDbclick = (e) => {
 					const div2 = document.createElement("div");
 					div2.className = "drag newContent";
 					div2.innerText = e.target.parentNode.childNodes[1].innerText;
-					this.setDragMotion(div2);
+					this.setDragMotion(div2,2);
 					desk.appendChild(div2);
 				}
 				div.addEventListener("dblclick", handleDbclick);
@@ -100,18 +100,15 @@ class Window {
 		return childs;
 	}
 
-	setDragMotion(div) {
-		const handleDrag = (x, y) => {
-			div.style.left = x-div.offsetWidth/3+"px" ;
-			div.style.top = y-div.offsetHeight/3+"px";
-		}
-		const handleMove = (e) => {
-			handleDrag(e.pageX, e.pageY);
+	setDragMotion(div, y) {
+		const handleDrag = (e) => {
+			div.style.left = e.pageX-div.offsetWidth/2+"px" ;
+			div.style.top = e.pageY-div.offsetHeight/y+"px";
 		}
 		const handleIconMousedown = (e) => {
-			div.addEventListener("mousemove", handleMove);
+			div.addEventListener("mousemove", handleDrag);
 			const handleIconMouseup = (e) => {
-				div.removeEventListener("mousemove", handleMove);
+				div.removeEventListener("mousemove", handleDrag);
 			}
 			div.addEventListener("mouseup", handleIconMouseup);
 		}
