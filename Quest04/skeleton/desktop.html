@@ -10,9 +10,77 @@
 		</section>
 
 		<script>
+			const folderCount = 10;
+			const iconCount = 8;
+			let firstWidth = 10;
+			let firstHeight = 10;
 			let myDesktop = new Desktop(
 				/* TODO: myDesktop 인스턴스의 생성자의 변수로 무엇이 들어가야 할까요? */
+				folderCount, iconCount, "geonyeong"
 			);
+			const desk = document.querySelector(".desktop");
+			const buildDiv = (icon) => {
+				const div = document.createElement("div");
+				div.className = "drag";
+				div.style.left = firstWidth + "px";
+				div.style.top = firstHeight + "px";
+				if (firstHeight <= 700) {
+					firstHeight += 70;
+				} else {
+					firstHeight = 10;
+					firstWidth += 70;
+				}
+				const iconImg = document.createElement("img");
+				const p = document.createElement("p");
+				iconImg.src = "http://gdimg.gmarket.co.kr/1733830715/still/280";
+				iconImg.className = "iconImg";
+				iconImg.style.width = icon.width;
+				iconImg.style.height = icon.height;
+				p.innerText = icon.fName || icon.name;
+				div.appendChild(iconImg);
+				div.appendChild(p);
+				
+				return div;
+			}
+			const dragMotion = (div) => {
+				const handleDrag = (x, y) => {
+					div.style.left = x-div.offsetWidth/3+"px" ;
+					div.style.top = y-div.offsetHeight/3+"px";
+				}
+				const handleMove = (e) => {
+					handleDrag(e.pageX, e.pageY);
+				}
+				const handleIconMousedown = (e) => {
+					div.addEventListener("mousemove", handleMove);
+					const handleIconMouseup = (e) => {
+						div.removeEventListener("mousemove", handleMove);
+					}
+					div.addEventListener("mouseup", handleIconMouseup);
+				}
+				div.addEventListener("mousedown", handleIconMousedown);
+				div.ondragstart = function() {
+					return false;
+				}
+			}
+
+			for(icon of myDesktop.icons) {
+				const div = buildDiv(icon);
+				dragMotion(div);
+				desk.appendChild(div);
+			}
+			for(folder of myDesktop.folders) {
+				const div = buildDiv(folder);
+				dragMotion(div);
+				const handleDbclick = (e) => {
+					const div2 = document.createElement("div");
+					div2.className = "drag newContent";
+					div2.innerText = e.target.parentNode.childNodes[1].innerText;
+					dragMotion(div2);
+					desk.appendChild(div2);
+				}
+				div.addEventListener("dblclick", handleDbclick);
+				desk.appendChild(div);
+			}
 		</script>
 	</body>
 </html>
