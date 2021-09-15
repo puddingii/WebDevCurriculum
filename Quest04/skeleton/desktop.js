@@ -67,20 +67,83 @@ class Window {
 		this.#folders = setFolders;
 		this.#icons = setIcons;
 	}
-	get folders() {
-		return this.#folders;
-	}
-	set folders(folders) {
-		this.#folders = folders;
-	}
-	get icons() {
-		return this.#icons;
-	}
-	set icons(icons) {
-		this.#icons = icons;
+	// get folders() {
+	// 	return this.#folders;
+	// }
+	// set folders(folders) {
+	// 	this.#folders = folders;
+	// }
+	// get icons() {
+	// 	return this.#icons;
+	// }
+	// set icons(icons) {
+	// 	this.#icons = icons;
+	// }
+
+	initContent() {
+		const childs = []
+		for(let i of this.#icons.concat(this.#folders)) {
+			const div = this.buildIcon(i);
+			this.setDragMotion(div);
+			if(i instanceof Folder) {
+				const handleDbclick = (e) => {
+					const div2 = document.createElement("div");
+					div2.className = "drag newContent";
+					div2.innerText = e.target.parentNode.childNodes[1].innerText;
+					this.setDragMotion(div2);
+					desk.appendChild(div2);
+				}
+				div.addEventListener("dblclick", handleDbclick);
+			}
+			childs.push(div);
+		}
+		return childs;
 	}
 
-	
+	setDragMotion(div) {
+		const handleDrag = (x, y) => {
+			div.style.left = x-div.offsetWidth/3+"px" ;
+			div.style.top = y-div.offsetHeight/3+"px";
+		}
+		const handleMove = (e) => {
+			handleDrag(e.pageX, e.pageY);
+		}
+		const handleIconMousedown = (e) => {
+			div.addEventListener("mousemove", handleMove);
+			const handleIconMouseup = (e) => {
+				div.removeEventListener("mousemove", handleMove);
+			}
+			div.addEventListener("mouseup", handleIconMouseup);
+		}
+		div.addEventListener("mousedown", handleIconMousedown);
+		div.ondragstart = function() {
+			return false;
+		}
+	}
+
+	buildIcon(icon) {
+		const div = document.createElement("div");
+		div.className = "drag";
+		div.style.left = this.#positionX + "px";
+		div.style.top = this.#positionY + "px";
+		if (this.#positionY <= 700) {
+			this.#positionY += 70;
+		} else {
+			this.#positionY = 10;
+			this.#positionX += 70;
+		}
+		const iconImg = document.createElement("img");
+		const p = document.createElement("p");
+		iconImg.src = "http://gdimg.gmarket.co.kr/1733830715/still/280";
+		iconImg.className = "iconImg";
+		iconImg.style.width = icon.width;
+		iconImg.style.height = icon.height;
+		p.innerText = icon.fName || icon.name;
+		div.appendChild(iconImg);
+		div.appendChild(p);
+		
+		return div;
+	}
 };
 
 class Desktop extends Window{
@@ -97,5 +160,4 @@ class Desktop extends Window{
 	set myName(name) {
 		this.#myName = name;
 	}
-
 };

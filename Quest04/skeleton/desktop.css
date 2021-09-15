@@ -7,6 +7,12 @@ p {
     margin: 0;
 }
 
+.window {
+    position: relative;
+    margin-bottom:10px;
+    border:1px solid black;
+}
+
 .drag {
     position: absolute;
     width: 70px;
@@ -17,4 +23,8 @@ p {
     background-color: rgb(206, 206, 206);
     width: 200px;
     height: 200px;
+}
+
+.disnone {
+    display: none;
 }
