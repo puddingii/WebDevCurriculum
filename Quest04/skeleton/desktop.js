@@ -91,7 +91,7 @@ class Window {
 					div2.className = "drag newContent";
 					div2.innerText = e.target.parentNode.childNodes[1].innerText;
 					this.setDragMotion(div2,2);
-					desk.appendChild(div2);
+					e.target.parentNode.parentNode.appendChild(div2);
 				}
 				div.addEventListener("dblclick", handleDbclick);
 			}
