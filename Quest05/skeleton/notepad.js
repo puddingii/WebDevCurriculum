@@ -1,12 +1,4 @@
-const notepads = [];
-for(let i =0; i<50; i++) {
-	notepads.push({
-		content: "",
-		title: `notepad${i}`
-	});
-}
-
-class Button {
+class NButton {
 	#title;
 	constructor(title) {
 		this.#title = title;
@@ -27,11 +19,10 @@ class Button {
 		
 		return li;
 	}
-	setClickList() {
-		const list = document.getElementById(this.#title);
+	setClickList(li) {
 		const clickButton = (e) => {
 			if(e.target.classList.value === "nav-link") {
-				const as = document.querySelectorAll("a");
+				const as = document.querySelectorAll("a.nav-link");
 				as.forEach((a) => {
 					if(e.target.id !== a.id) {
 						a.className = "nav-link";
@@ -42,11 +33,15 @@ class Button {
 				document.querySelector(`.${this.#title}Form`).style.display = "";
 			}
 		}
-		list.addEventListener("click", clickButton);
+		li.addEventListener("click", clickButton);
 	}
 	setDifSave(btn) { 
+		btn.id = "difBtn";
 		const handleDifSave = (e) => {
-			console.log(e.target.parentNode);
+			const id = e.target.parentNode.querySelector("input").value;
+			const value = e.target.parentNode.parentNode.querySelector("textarea").value;
+			localStorage[id] = value;
+			location.reload();
 		}
 		btn.addEventListener("click", handleDifSave);
 	}
@@ -54,13 +49,13 @@ class Button {
 		const handleSave = (e) => {
 			const text = e.target.parentNode.querySelector("textarea").value;
 			localStorage[this.#title] = text;
-			console.log(localStorage[this.#title]);
+			location.reload();
 		}
 		btn.addEventListener("click", handleSave);
 	}
 	setClose(btn) {
 		const handleClose = (e) => {
-			e.target.parentNode.remove();
+			e.target.parentNode.parentNode.remove();
 			document.querySelector(`#${this.#title}`).parentNode.remove();
 		}
 		btn.addEventListener("click", handleClose);
@@ -85,7 +80,7 @@ class Button {
 	}
 }
 
-class Notepad extends Button{
+class Notepad extends NButton{
 	#content;
 	constructor(title, content = "") {
 		super(title);
@@ -107,38 +102,34 @@ class Notepad extends Button{
 		const label = document.createElement("label");
 		label.for = super.title;
 		label.innerText = "Write";
+		const btnGroup = document.createElement("div");
+		btnGroup.id = "btnGroup";
 		const button1 = super.setButton("btn btn-outline-primary","저장");
 		const button2 = super.setButton("btn btn-outline-primary","다른이름으로 저장");
 		const button3 = super.setButton("btn btn-outline-danger","닫기");
+		const input = document.createElement("input");
+		input.type= "text";
+		input.className = "form-control";
+		input.id = "difBtn";
+		input.value = super.title;
 
 		div.appendChild(textarea);
 		div.appendChild(label);
-		div.appendChild(button1);
-		div.appendChild(button2);
-		div.appendChild(button3);
+		btnGroup.appendChild(button1);
+		btnGroup.appendChild(button2);
+		btnGroup.appendChild(button3);
+		btnGroup.appendChild(input);
+		div.appendChild(btnGroup);
 		div.style.display = "none";
 
 		return div;
-	}
-	setStorage() {
-
-	}
-	saveLocal() {
-
-	}
-	loadLocal() {
-
 	}
 };
 
 class Terminal {
 	#notepads
-	constructor(count) {
-		const lcStorage = [];
-		for(let i = 0; i< count; i+=1) {
-			lcStorage.push(new Notepad(notepads[i].title, notepads[i].content));
-		}
-		this.#notepads = lcStorage;
+	constructor() {
+		this.#notepads = this.loadContent();
 	}
 	get notepads() {
 		return this.#notepads;
@@ -146,20 +137,79 @@ class Terminal {
 	set notepads(pads) {
 		this.#notepads = pads;
 	}
-	initTerminal() {
+
+	getStorageItem(text) {
+		return localStorage.getItem(text);
+	}
+
+	loadContent() {
+		const content = [];
+		for(let i = 0; i < localStorage.length; i+= 1) {
+			const tmp = localStorage.key(i);
+			content.push({title:tmp, content:this.getStorageItem(tmp)});
+		}
+		return content;
+	}
+	
+	loadDropdownMenu(value) {
+		const dropd = document.querySelector(".dropdown-menu");
+		const li = document.createElement("li");
+		const a =document.createElement("a");
+		a.className = "dropdown-item";
+		a.href="";
+		a.innerText= value;
+		li.appendChild(a);
+		dropd.appendChild(li);
+	}
+
+	setListAndNote(id, value) {
 		const navbar = document.querySelector(".navba");
 		const notepad = document.querySelector(".notepad");
-		for(let not of this.#notepads) {
-			const note = new Notepad(not.title, "a");
-			// button & textarea setting
-			const li = note.initTitles();
-			const textForm = note.initNotepad();
-			navbar.appendChild(li);
-			notepad.appendChild(textForm);
-			note.setClickList();
-		}
+		const note = new Notepad(id, value);
+		// button & textarea setting
+		const li = note.initTitles();
+		const textForm = note.initNotepad();
+		navbar.appendChild(li);
+		notepad.appendChild(textForm);
+		note.setClickList(li);
 	}
-	closeNote() {
 
+	setDropMenuAction() {
+		const loadList = document.querySelectorAll(".dropdown-item");
+		const handleLoadList = (e) => {
+			e.preventDefault();
+			const currentList = document.querySelectorAll(".nav-link");
+			let isExisting = false;
+			currentList.forEach((item) => {
+				if(item.id === e.target.innerText) {
+					isExisting = true;
+				}
+			});
+			if(!isExisting) {
+				const id = e.target.innerText;
+				this.setListAndNote(id, this.getStorageItem(id));
+			}
+		}
+		loadList.forEach((item) => {
+			item.addEventListener("click", handleLoadList);
+		});
+	}
+
+	initNewFile() {
+		const openBtn = document.getElementById("openFile");
+		const handleOpenFile = (e) => {
+			const random = Math.floor(Math.random()*1000000+1);
+			this.setListAndNote(`tmp${random}`, "");
+		}
+		openBtn.addEventListener("click", handleOpenFile);
+	}
+	
+	initTerminal() {
+		for(let not of this.#notepads) {
+			this.loadDropdownMenu(not.title);
+			this.setListAndNote(not.title, not.content);
+		}
+		this.setDropMenuAction();
+		this.initNewFile();
 	}
 };

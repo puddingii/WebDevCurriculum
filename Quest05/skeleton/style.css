@@ -6,10 +6,18 @@
 	margin-bottom: 10px;
 }
 
-.form-control {
+textarea {
 	height: 500px !important;
 }
 
 .disNone {
 	display: none;
+}
+
+#btnGroup {
+	margin-top: 10px;
+}
+
+input#difBtn {
+	width: 200px;
 }
