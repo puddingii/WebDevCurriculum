@@ -47,8 +47,14 @@ class NButton {
 		const handleDifSave = (e) => {
 			const id = e.target.parentNode.querySelector("input").value;
 			const value = e.target.parentNode.parentNode.querySelector("textarea").value;
-			localStorage[id] = value;
-			location.reload();
+			console.log(localStorage[id]);
+			if(localStorage[id]) {
+				alert("같은 이름의 파일이 있습니다!")
+			} else {
+				localStorage[id] = value;
+				location.reload();
+			}
+			
 		}
 		btn.addEventListener("click", handleDifSave);
 	}
@@ -57,8 +63,9 @@ class NButton {
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setSave(btn) {
 		const handleSave = (e) => {
-			const text = e.target.parentNode.querySelector("textarea").value;
+			const text = e.target.parentNode.parentNode.querySelector("textarea").value;
 			localStorage[this.#title] = text;
+			alert("저장되었습니다.");
 			location.reload();
 		}
 		btn.addEventListener("click", handleSave);
@@ -107,6 +114,13 @@ class Notepad extends NButton{
 		this.#content = con;
 	}
 	// textarea생성과 textarea처리를 위한 버튼 생성
+	detectTextarea(textarea) {
+		const handleTextarea = (e) => {
+			e.target.parentNode.querySelector("label").innerText = "저장 안됨."
+		}
+		textarea.addEventListener("input", handleTextarea);
+	}
+
 	initNotepad() {
 		const div = document.createElement("div");
 		div.className= `form-floating ${super.title}Form`;
@@ -114,6 +128,7 @@ class Notepad extends NButton{
 		textarea.className = "form-control";
 		textarea.id = super.title;
 		textarea.value = this.#content;
+		this.detectTextarea(textarea);
 		const label = document.createElement("label");
 		label.for = super.title;
 		label.innerText = "Write";
