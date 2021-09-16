@@ -6,6 +6,8 @@ class NButton {
 	get title() {
 		return this.#title;
 	}
+
+	// haeder에 있는 리스트들 쓰기
 	initTitles() {
 		const li = document.createElement("li");
 		li.className = "nav-item";
@@ -19,6 +21,8 @@ class NButton {
 		
 		return li;
 	}
+
+	// 클릭이벤트 처리
 	setClickList(li) {
 		const clickButton = (e) => {
 			if(e.target.classList.value === "nav-link") {
@@ -35,6 +39,9 @@ class NButton {
 		}
 		li.addEventListener("click", clickButton);
 	}
+
+	// 다른이름으로 저장버튼 이벤트처리
+	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setDifSave(btn) { 
 		btn.id = "difBtn";
 		const handleDifSave = (e) => {
@@ -45,6 +52,9 @@ class NButton {
 		}
 		btn.addEventListener("click", handleDifSave);
 	}
+
+	// 저장버튼 이벤트처리
+	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setSave(btn) {
 		const handleSave = (e) => {
 			const text = e.target.parentNode.querySelector("textarea").value;
@@ -53,6 +63,8 @@ class NButton {
 		}
 		btn.addEventListener("click", handleSave);
 	}
+
+	// 닫기버튼 이벤트처리
 	setClose(btn) {
 		const handleClose = (e) => {
 			e.target.parentNode.parentNode.remove();
@@ -60,6 +72,8 @@ class NButton {
 		}
 		btn.addEventListener("click", handleClose);
 	}
+
+	// 버튼을 만들고 각 버튼에 맞는 이벤트 처리
 	setButton(className, innerText) {
 		const btn = document.createElement("button");
 		btn.type = "button";
@@ -92,6 +106,7 @@ class Notepad extends NButton{
 	set content(con) {
 		this.#content = con;
 	}
+	// textarea생성과 textarea처리를 위한 버튼 생성
 	initNotepad() {
 		const div = document.createElement("div");
 		div.className= `form-floating ${super.title}Form`;
@@ -138,10 +153,12 @@ class Terminal {
 		this.#notepads = pads;
 	}
 
+	// localStorage에서 text에 맞는 value 긁기. 
 	getStorageItem(text) {
 		return localStorage.getItem(text);
 	}
 
+	// localStorage 전체 읽기.
 	loadContent() {
 		const content = [];
 		for(let i = 0; i < localStorage.length; i+= 1) {
@@ -151,6 +168,7 @@ class Terminal {
 		return content;
 	}
 	
+	// Dropdown에 localStorage내용물을 긁어와서 표시
 	loadDropdownMenu(value) {
 		const dropd = document.querySelector(".dropdown-menu");
 		const li = document.createElement("li");
@@ -162,6 +180,7 @@ class Terminal {
 		dropd.appendChild(li);
 	}
 
+	// id와 value값으로 header쪽의 리스트와 textarea노트 생성
 	setListAndNote(id, value) {
 		const navbar = document.querySelector(".navba");
 		const notepad = document.querySelector(".notepad");
@@ -174,6 +193,8 @@ class Terminal {
 		note.setClickList(li);
 	}
 
+	// dropdown안에 있는 요소 클릭시 발생하는 이벤트설정. 
+	// 클릭시 만약 리스트에 없다면 setListAndNote를 사용해 불러옴.
 	setDropMenuAction() {
 		const loadList = document.querySelectorAll(".dropdown-item");
 		const handleLoadList = (e) => {
@@ -195,6 +216,7 @@ class Terminal {
 		});
 	}
 
+	// 파일 만들때 난수 생성해서 이름짓고 리스트추가 및 노트생성.(저장 안된상태)
 	initNewFile() {
 		const openBtn = document.getElementById("openFile");
 		const handleOpenFile = (e) => {
