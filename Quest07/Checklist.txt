@@ -1,0 +1,40 @@
+1. node.js는 무엇인가요? node.js의 내부는 어떻게 구성되어 있을까요?
+ nodejs는 비동기 이벤트 주도 js런타임이다. 구조는 c/c++, js로 만들어졌는데 c++/c로 구성되어 c/c++로 작성된 라이브러리를 js에서 사용할 수 있는 노드 바인딩이 있고
+ 구글에서 개발된 오픈소스 JIT가상머신 형식의 JS엔진인 V8이 있다. 또 비동기 I/O라이브러리로 구성된 쓰레드 풀과 이벤트루프,  C라이브러리 등을 가지고 있다.
+
+2. npm이 무엇인가요? package.json 파일은 어떤 필드들로 구성되어 있나요?
+ npm은 Node Packaged Manager의 약자로 자바스크립트 패키지 매니저이고 nodejs에서 사용할 수 있는 모듈을 패키지화 해서 설치관리 할 수 있는 cli를 제공한다.
+ 웹사이트, CLI, 레지스트리로 구성되어있다. package.json은 이름, 버전, 필드, 설명, 키워드, 홈페이지, 버그, 특허 등으로 구성되어 있다.
+
+3. npx는 어떤 명령인가요? npm 패키지를 -g 옵션을 통해 글로벌로 저장하는 것과 그렇지 않은 것은 어떻게 다른가요?
+ npx는 npm의 5.2.0버전부터 새로 추가된 도구로 npm을 좀 더 편하게 사용하기 위해 npm에서 제공해주는 도구이다. npm이 package관리면 npx는 package실행이라 생각하면
+ -g옵션은 노드가 설치된 모든 위치에 항목을 넣고 없는 경우는 node_modules인 현재 패키지루트에 넣는다는 뜻이다.
+
+4. 자바스크립트 코드에서 다른 파일의 코드를 부르는 시도들은 지금까지 어떤 것이 있었을까요? CommonJS 대신 ES Modules가 등장한 이유는 무엇일까요?
+ require와 module.exports 그리고 import와 export가 있다. CommonJS의 require은 동기로 이루어져서 promise나 콜백을 리턴하지 않고 스크립트를 즉시 실행한다.
+ 따라서 스스로 io나 side effect를 실행하고 module.exports에 설정되어 있는 값을 리턴한다. ES Modules은 가져온 스크립트를 바로 실행하지 않고
+ import와 export구문을 찾아서 스크립트를 파싱한다. 파싱 단계에서, 실제로 ESM로더는 종속성이 있는 코드를 실행하지 않고도 named imports에 있는 오타를 감지하여 에러를 발생시킬 수 있다.
+ +)CommonJS에서는 처음부터 비동기 로드를 고려하지 않고 설계를 했기 때문에 브라우저에서 CommonJS를 사용할 수 없다는 문제가 있었다. 그래서나온게 Browserify.
+ +)AMD(Asynchronous Module Definition)은 비동기 상황에도 JS모듈을 쓰기 위해 CommonJS에서 독립한 별도의 그룹임.
+ ==>여기서 나온게 ES6 Module이다. Javascript의 표준 모듈 시스템이 명세되었는데 여기서 동기/비동기를 모두 지원하고 문법이 간단하다.
+ 즉 등장한 이유로 동기/비동기를 다 지원하기 위함과 문법의 간단화이다.
+
+5. ES Modules는 기존의 require()와 동작상에 어떤 차이가 있을까요? CommonJS는 할 수 있으나 ES Modules가 할 수 없는 일에는 어떤 것이 있을까요?
+ CommonJS의 require은 동기로 이루어져서 promise나 콜백을 리턴하지 않고 스크립트를 즉시 실행한다. 따라서 스스로 io나 side effect를 실행하고 module.exports에 설정되어 
+ 있는 값을 리턴한다. ES Modules은 가져온 스크립트를 바로 실행하지 않고 import와 export구문을 찾아서 스크립트를 파싱한다.
+ CommonJS에서는 모듈 지정자를 변수에 넣을 수 있지만 ES Module에서는 넣을 수 없다. 
+                     CommonJS       ESModule
+파일 부를때의 주 스레드    차단           차단X
+export            export객체에 복사  export는 참조를 반환하는 함수 정의
+모듈지정자를 변수에?    넣을수 있다.     넣을수 없다.
+
+6. node.js에서 ES Modules를 사용하려면 어떻게 해야 할까요? ES Modules 기반의 코드에서 CommonJS 기반의 패키지를 불러오려면 어떻게 해야 할까요? 그 반대는 어떻게 될까요?
+ES Module의 경우 export default app; => import ap from "./app";  해당 모듈엔 개체가 하나란 뜻
+                export const 변수명 => import { 변수명 } from "./파일명";
+CJS와 ESM 모두 지원하는 방법으로 CJS 버전으로 라이브러리를 제공하면 된다.
+package.json에 type옵션에서 module을 추가하고 exports옵션에서 require와 import를 추가해야한다.
+"type" "module",
+"exports": {
+    "require": "./index.js",
+    "import": "./esm/wrapper.js"
+}

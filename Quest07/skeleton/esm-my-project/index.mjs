@@ -1,1 +1,10 @@
 // TODO: cjs-package와 esm-package의 함수와 클래스들을 가져다 쓰고 활용하려면 어떻게 해야 할까요?
+import { EsmUtilClass, esmUtilFunction } from "../esm-package/index.mjs";
+const es = new EsmUtilClass(4);
+console.log(es.double());
+console.log(esmUtilFunction("hello"));
+
+import { CjsUtilClass, cjsUtilFunction } from "../cjs-package";
+const cj = new CjsUtilClass(6);
+console.log(cj.double());
+console.log(cjsUtilFunction("everybody"));
