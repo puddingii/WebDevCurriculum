@@ -3,8 +3,3 @@ import { EsmUtilClass, esmUtilFunction } from "../esm-package/index.mjs";
 const es = new EsmUtilClass(4);
 console.log(es.double());
 console.log(esmUtilFunction("hello"));
-
-import { CjsUtilClass, cjsUtilFunction } from "../cjs-package";
-const cj = new CjsUtilClass(6);
-console.log(cj.double());
-console.log(cjsUtilFunction("everybody"));

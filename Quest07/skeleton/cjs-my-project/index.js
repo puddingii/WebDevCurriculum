@@ -3,6 +3,3 @@ const { CjsUtilClass, cjsUtilFunction } = require("../cjs-package");
 const cj = new CjsUtilClass(2);
 console.log(cj.double());
 console.log(cjsUtilFunction("hello;;"));
-
-const mod = require("../esm-package");
-console.log(mod.esmUtilFunction("asdf"));
