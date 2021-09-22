@@ -38,3 +38,7 @@ package.json에 type옵션에서 module을 추가하고 exports옵션에서 requ
     "require": "./index.js",
     "import": "./esm/wrapper.js"
 }
+
+Advanced
+1. nodejs외의 자바스크립트 런타임에는 어떤 것이 있을까요?
+ 크롬(Chrome), 파이어폭스(Firefox), 익스플로러(Explorer) 등이 있다.
