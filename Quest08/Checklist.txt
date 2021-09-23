@@ -1,0 +1,30 @@
+1. HTTP의 GET과 POST 메소드는 어떻게 다른가요?
+ GET은 특정한 자원을 요청하는 메소드이며 http body에 데이터를 담지 않고 url에 값을 담는다(쿼리 스트링).
+ POST는 리소스를 생성 및 변경하기 위해 설계되어 http body에 데이터를 담아 전송한다.
+ 1-1. 다른 HTTP 메소드에는 무엇이 있나요?
+  PUT, DELETE, HEAD, OPTIONS 등이 있다.
+  PUT은 데이터를 같이 담아 전송해 전송한 데이터를 참조하여 수정을 하기위한 메소드이다. DELETE는 그 말대로 삭제를 위한 메소드이다.
+  HEAD는 리소스를 보내지만 response는 받지않는 메소드이다. OPTIONS는 보내는 곳(서버)의 지원가능한 메소드(GET, POST, 등등..)을 확인하기 위한 메소드이다.
+
+2. HTTP 서버에 GET과 POST를 통해 데이터를 보내려면 어떻게 해야 하나요?
+ GET의 경우 URL에 데이터를 담는다.(쿼리 스트링) POST의 경우 HTTP BODY에 데이터를 담아 보낸다.
+ 2-1. HTTP 요청의 Content-Type 헤더는 무엇인가요?
+  미디어 타입(MIME)과 문자열 인코딩(utf-8 등)의 정보를 가지고 있는 헤더이다. 
+ 2-2. Postman에서 POST 요청을 보내는 여러 가지 방법(form-data, x-www-form-urlencoded, raw, binary) 각각은 어떤 용도를 가지고 있나요?
+  form-data : 양식을 채울 때 입력한 세부정보와 같이 양식 내부에 랩핑하는 데이터를 보내는데 사용된다. (key-value형식)
+  x-www-form-urlencoded : form-data와 비슷한 목적이며 전송될 때 인코딩이 된다는 점을 제외한 나머지는 form-data와 똑같다.
+  raw : 본문 메시지가 비트 스트림으로 보내진다.
+  binary : 수동으로 입력할 수 없는 형식으로 정보를 전송한다.(바이너리로 다 변환됨)
+  
+
+3. node.js의 http 모듈을 통해 HTTP 요청을 처리할 때,
+ 3-1. req와 res 객체에는 어떤 정보가 담겨있을까요?
+  req에는 파라미터에 있는 데이터를 모두 가져오는 req.params나 header값을 가져오는 req.headers 등의 서버에 접속했을때 받게 되는 정보들이 담겨있다.
+  res에는 send나 redirect 등으로 사용자에게 응답을 보내주기 위한 정보들이 담겨있다.
+ 3-2. GET과 POST에 대한 처리 형태가 달라지는 이유는 무엇인가요?
+  get의 경우 쿼리 스트링으로 데이터를 보내주고 post에서는 http body에 데이터를 넣어서 보내주기 때문이다. 또 get방식은 post와 달리 request를 할때 캐싱(데이터 저장)한다. 
+
+4. 만약 API 엔드포인트(URL)가 아주 많다고 한다면, HTTP POST 요청의 Content-Type 헤더에 따라 다른 방식으로 동작하는 서버를 어떻게 정리하면 좋을까요?
+ request.headers를 사용해서 content-type에 따라 switch case문을 사용하여 정리하면 좋을 것 같다.
+ 4-1. 그 밖에 서버가 요청들에 따라 공통적으로 처리하는 일에는 무엇이 있을까요? 이를 어떻게 정리하면 좋을까요?
+  http클라이언트가 서버에 접속하면 http세션이 생성된다. 그리고 http세션을 통해 서버에 저장된 서비스를 받고 http트랜잭션(req~res)을 순차적으로 처리한다.
