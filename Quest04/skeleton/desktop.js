@@ -1,84 +1,66 @@
-const folders = [];
-const icons = [];
-for(let i =0; i<50; i++) {
-	folders.push({
-		fName: `폴더${i}`,
-		iName: `icon${i}`
-	});
-	icons.push(`icon${i+51}`);
-}
-
 class Icon {
-	/* TODO: Icon 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
 	#name;
-	#width;
-	#height;
-	constructor(name="null") {
+	#width = 40; // constructor안에서 밖으로 이동
+	#height = 40;
+	constructor(name="TempIcon") {
 		this.#name = name;
-		this.#width = "40px";
-		this.#height = "40px";
 	}
 
+	// Getter & Setter
 	get name() {
 		return this.#name;
 	}
 	set name(n) {
 		this.#name = n;
 	}
+	set width(wid) {
+		this.#width = wid;
+	}
 	get width() {
 		return this.#width;
+	}
+	set height(hei) {
+		this.#height = hei;
 	}
 	get height() {
 		return this.#height;
 	}
-
 };
 
 class Folder extends Icon {
-	/* TODO: Folder 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-	#fName;
-	constructor(fName, iName) {
-		super(iName);
-		this.#fName = fName;
+	#folderName;
+	constructor(folderName, iconName) {
+		super(iconName);
+		this.#folderName = folderName;
 	}
-	get fName() {
-		return this.#fName;
+
+	// Getter & Setter
+	get folderName() {
+		return this.#folderName;
 	}
-	set fName(name) {
-		this.#fName = name;
+	set folderName(name) {
+		this.#folderName = name;
 	}
 };
 
-class Window {
-	/* TODO: Window 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
+class MyWindow {
 	#folders;
 	#icons;
 	#positionX = 10;
 	#positionY = 10;
-	constructor(iCount, fCount) {
+	constructor(iconCount, folderCount) {
 		const setFolders = [];
 		const setIcons = [];
-		for(let i=0; i<iCount; i+=1) {
-			setIcons.push(new Icon(icons[i], icons[i]));
+		let i = 0;
+		for(; i<iconCount; i++) {
+			setIcons.push(new Icon(`아이콘${i}`));
 		}
-		for(let i=0; i<fCount; i+=1) {
-			setFolders.push(new Folder(folders[i].fName, folders[i].iName));
+		for(let j = 0; j<folderCount; j++) {
+			setFolders.push(new Folder(`폴더${j}`, `아이콘${i+j}`));
 		}
 		this.#folders = setFolders;
 		this.#icons = setIcons;
 	}
-	// get folders() {
-	// 	return this.#folders;
-	// }
-	// set folders(folders) {
-	// 	this.#folders = folders;
-	// }
-	// get icons() {
-	// 	return this.#icons;
-	// }
-	// set icons(icons) {
-	// 	this.#icons = icons;
-	// }
 
 	initContent() {
 		const childs = []
@@ -90,6 +72,7 @@ class Window {
 					const div2 = document.createElement("div");
 					div2.className = "drag newContent";
 					div2.innerText = e.target.parentNode.childNodes[1].innerText;
+					//parentNode변경필요. ?문법
 					this.setDragMotion(div2,2);
 					e.target.parentNode.parentNode.appendChild(div2);
 				}
@@ -101,19 +84,23 @@ class Window {
 	}
 
 	setDragMotion(div, y) {
-		const handleDrag = (e) => {
-			div.style.left = e.pageX-div.offsetWidth/2+"px" ;
-			div.style.top = e.pageY-div.offsetHeight/y+"px";
-		}
+		let z_index;
+		const handleDrag = (e) => { //template literals로 변경
+			div.style.left = `${e.pageX-div.offsetWidth/2}px`;
+			div.style.top = `${e.pageY-div.offsetHeight/y}px`;
+		}// z-index
 		const handleIconMousedown = (e) => {
+			z_index = div.style.zIndex;
+			div.style.zIndex = 9999;
 			div.addEventListener("mousemove", handleDrag);
 			const handleIconMouseup = (e) => {
 				div.removeEventListener("mousemove", handleDrag);
+				div.style.zIndex = z_index;
 			}
 			div.addEventListener("mouseup", handleIconMouseup);
 		}
 		div.addEventListener("mousedown", handleIconMousedown);
-		div.ondragstart = function() {
+		div.ondragstart = () => { // function -> arrow function
 			return false;
 		}
 	}
@@ -121,8 +108,8 @@ class Window {
 	buildIcon(icon) {
 		const div = document.createElement("div");
 		div.className = "drag";
-		div.style.left = this.#positionX + "px";
-		div.style.top = this.#positionY + "px";
+		div.style.left = `${this.#positionX}px`;
+		div.style.top = `${this.#positionY}px`;
 		if (this.#positionY <= 700) {
 			this.#positionY += 70;
 		} else {
@@ -133,9 +120,9 @@ class Window {
 		const p = document.createElement("p");
 		iconImg.src = "http://gdimg.gmarket.co.kr/1733830715/still/280";
 		iconImg.className = "iconImg";
-		iconImg.style.width = icon.width;
-		iconImg.style.height = icon.height;
-		p.innerText = icon.fName || icon.name;
+		iconImg.style.width = `${icon.width}px`;
+		iconImg.style.height = `${icon.height}px`;
+		p.innerText = icon.folderName || icon.name;
 		div.appendChild(iconImg);
 		div.appendChild(p);
 		
@@ -143,8 +130,7 @@ class Window {
 	}
 };
 
-class Desktop extends Window{
-	/* TODO: Desktop 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
+class Desktop extends MyWindow{
 	#myName;
 	constructor(fCount, iCount, myName) {
 		super(fCount, iCount);

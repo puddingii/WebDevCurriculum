@@ -1,0 +1,22 @@
+{
+  "name": "webdevcurriculum",
+  "version": "1.0.0",
+  "description": "ESLint",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/puddingii/WebDevCurriculum.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/puddingii/WebDevCurriculum/issues"
+  },
+  "homepage": "https://github.com/puddingii/WebDevCurriculum#readme",
+  "devDependencies": {
+    "eslint": "^7.32.0"
+  }
+}
