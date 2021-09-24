@@ -9,28 +9,29 @@ class NButton {
 
 	// haeder에 있는 리스트들 쓰기
 	initTitles() {
-		const li = document.createElement("li");
-		li.className = "nav-item";
-		const a = document.createElement("a");
-		a.className = "nav-link";
-		a.ariaCurrent = "page";
-		a.href= "#";
-		a.id = this.#title;
-		a.innerText = this.#title;
-		li.appendChild(a);
+		const noteList = document.createElement("li");
+		noteList.className = "nav-item notetab";
+
+		const noteLink = document.createElement("a");
+		noteLink.className = "nav-link notelink";
+		noteLink.ariaCurrent = "page";
+		noteLink.href= "#";
+		noteLink.id = this.#title;
+		noteLink.innerText = this.#title;
+		noteList.appendChild(noteLink);
 		
-		return li;
+		return noteList;
 	}
 
 	// 클릭이벤트 처리
 	setClickList(li) {
 		const clickButton = (e) => {
-			if(e.target.classList.value === "nav-link") {
-				const as = document.querySelectorAll("a.nav-link");
-				as.forEach((a) => {
-					if(e.target.id !== a.id) {
-						a.className = "nav-link";
-						document.querySelector(`.${a.id}Form`).style.display = "none";
+			if(e.target.classList.contains("notelink")) {
+				const noteLinks = document.querySelectorAll("a.notelink");
+				noteLinks.forEach((notelink) => {
+					if(e.target.id !== notelink.id) {
+						notelink.classList.remove("active");
+						document.querySelector(`.${notelink.id}Form`).style.display = "none";
 					}
 				})
 				e.target.classList.toggle("active");
@@ -66,7 +67,6 @@ class NButton {
 			const text = e.target.parentNode.parentNode.querySelector("textarea").value;
 			localStorage[this.#title] = text;
 			alert("저장되었습니다.");
-			location.reload();
 		}
 		btn.addEventListener("click", handleSave);
 	}
@@ -134,9 +134,9 @@ class Notepad extends NButton{
 		label.innerText = "Write";
 		const btnGroup = document.createElement("div");
 		btnGroup.id = "btnGroup";
-		const button1 = super.setButton("btn btn-outline-primary","저장");
-		const button2 = super.setButton("btn btn-outline-primary","다른이름으로 저장");
-		const button3 = super.setButton("btn btn-outline-danger","닫기");
+		const saveBtn = super.setButton("btn btn-outline-primary","저장");
+		const saveDifBtn = super.setButton("btn btn-outline-primary","다른이름으로 저장");
+		const closeBtn = super.setButton("btn btn-outline-danger","닫기");
 		const input = document.createElement("input");
 		input.type= "text";
 		input.className = "form-control";
@@ -145,9 +145,9 @@ class Notepad extends NButton{
 
 		div.appendChild(textarea);
 		div.appendChild(label);
-		btnGroup.appendChild(button1);
-		btnGroup.appendChild(button2);
-		btnGroup.appendChild(button3);
+		btnGroup.appendChild(saveBtn);
+		btnGroup.appendChild(saveDifBtn);
+		btnGroup.appendChild(closeBtn);
 		btnGroup.appendChild(input);
 		div.appendChild(btnGroup);
 		div.style.display = "none";
@@ -175,35 +175,34 @@ class Terminal {
 
 	// localStorage 전체 읽기.
 	loadContent() {
-		const content = [];
-		for(let i = 0; i < localStorage.length; i+= 1) {
-			const tmp = localStorage.key(i);
-			content.push({title:tmp, content:this.getStorageItem(tmp)});
-		}
+		const content = Array.from({length: localStorage.length}, (_, i) => ({
+			title: localStorage.key(i),
+			content: this.getStorageItem(localStorage.key(i))
+		}));
 		return content;
 	}
 	
 	// Dropdown에 localStorage내용물을 긁어와서 표시
 	loadDropdownMenu(value) {
-		const dropd = document.querySelector(".dropdown-menu");
-		const li = document.createElement("li");
-		const a =document.createElement("a");
-		a.className = "dropdown-item";
-		a.href="";
-		a.innerText= value;
-		li.appendChild(a);
-		dropd.appendChild(li);
+		const loadMenu = document.querySelector(".dropdown-menu");
+		const loadList = document.createElement("li");
+		const itemLink = document.createElement("a");
+		itemLink.className = "dropdown-item";
+		itemLink.href="";
+		itemLink.innerText= value;
+		loadList.appendChild(itemLink);
+		loadMenu.appendChild(loadList);
 	}
 
 	// id와 value값으로 header쪽의 리스트와 textarea노트 생성
 	setListAndNote(id, value) {
-		const navbar = document.querySelector(".navba");
+		const navContainer = document.querySelector(".navContainer");
 		const notepad = document.querySelector(".notepad");
 		const note = new Notepad(id, value);
 		// button & textarea setting
 		const li = note.initTitles();
 		const textForm = note.initNotepad();
-		navbar.appendChild(li);
+		navContainer.appendChild(li);
 		notepad.appendChild(textForm);
 		note.setClickList(li);
 	}
@@ -242,9 +241,9 @@ class Terminal {
 	}
 	
 	initTerminal() {
-		for(let not of this.#notepads) {
-			this.loadDropdownMenu(not.title);
-			this.setListAndNote(not.title, not.content);
+		for(let notepad of this.#notepads) {
+			this.loadDropdownMenu(notepad.title);
+			this.setListAndNote(notepad.title, notepad.content);
 		}
 		this.setDropMenuAction();
 		this.initNewFile();
