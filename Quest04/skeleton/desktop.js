@@ -41,19 +41,6 @@ class Folder extends Icon {
 	set folderName(name) {
 		this.#folderName = name;
 	}
-
-	// 폴더 이벤트 처리
-	setFolderEvent(iconBox) {
-		const handleDbclick = (e) => {
-			const newBox = document.createElement("div");
-			const currentWindow = document.querySelector("div.window:not(.disnone)");
-			newBox.className = "drag newContent";
-			newBox.innerText = e.target.dataset.iconname ?? e.target.innerText;
-			new MyWindow().setDragMotion(newBox,2);
-			currentWindow.appendChild(newBox);
-		}
-		iconBox.addEventListener("dblclick", handleDbclick);
-	}
 };
 
 class MyWindow {
@@ -76,7 +63,8 @@ class MyWindow {
 			const iconBox = this.buildIconBox(iconAndFolder);
 			this.setDragMotion(iconBox,1);
 			if(iconAndFolder instanceof Folder) {
-				iconAndFolder.setFolderEvent(iconBox);
+				iconBox.classList.add("folder");
+				this.setFolderEvent(iconBox);
 			}
 			iconBoxes.push(iconBox);
 		}
@@ -106,10 +94,10 @@ class MyWindow {
 				iconBox.removeEventListener("mousemove", handleDrag);
 				iconBox.style.zIndex = z_index;
 			}
-			window.addEventListener("mouseup", handleIconMouseup);
+			iconBox.addEventListener("mouseup", handleIconMouseup);
 		}
 
-		window.addEventListener("mousedown", handleIconMousedown);
+		iconBox.addEventListener("mousedown", handleIconMousedown);
 		iconBox.ondragstart = () => {
 			return false;
 		}
@@ -139,6 +127,19 @@ class MyWindow {
 		iconDiv.appendChild(iconText);
 		
 		return iconDiv;
+	}
+
+	// 폴더 이벤트 처리
+	setFolderEvent(iconBox) {
+		const handleDbclick = (e) => {
+			const newBox = document.createElement("div");
+			const currentWindow = document.querySelector("div.window:not(.disnone)");
+			newBox.className = "drag newContent";
+			newBox.innerText = e.target.dataset.iconname ?? e.target.innerText;
+			this.setDragMotion(newBox,2);
+			currentWindow.appendChild(newBox);
+		}
+		iconBox.addEventListener("dblclick", handleDbclick);
 	}
 };
 
