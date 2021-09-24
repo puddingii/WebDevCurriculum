@@ -41,6 +41,19 @@ class Folder extends Icon {
 	set folderName(name) {
 		this.#folderName = name;
 	}
+
+	// 폴더 이벤트 처리
+	setFolderEvent(iconBox) {
+		const handleDbclick = (e) => {
+			const newBox = document.createElement("div");
+			const currentWindow = document.querySelector("div.window:not(.disnone)");
+			newBox.className = "drag newContent";
+			newBox.innerText = e.target.dataset.iconname ?? e.target.innerText;
+			new MyWindow().setDragMotion(newBox,2);
+			currentWindow.appendChild(newBox);
+		}
+		iconBox.addEventListener("dblclick", handleDbclick);
+	}
 };
 
 class MyWindow {
@@ -56,45 +69,46 @@ class MyWindow {
 	}
 
 	// 아이콘, 폴더를 화면안에 셋팅하는 함수
-	initContent() {
+	buildContent() {
 		const iconBoxes = []
 		const iconsAndFolders = this.#icons.concat(this.#folders);
 		for(let iconAndFolder of iconsAndFolders) {
 			const iconBox = this.buildIconBox(iconAndFolder);
 			this.setDragMotion(iconBox,1);
 			if(iconAndFolder instanceof Folder) {
-				this.setFolder(iconBox);
+				iconAndFolder.setFolderEvent(iconBox);
 			}
 			iconBoxes.push(iconBox);
 		}
+
 		return iconBoxes;
 	}
 
 	// Drag & Drop 기능
-	setDragMotion(div, y) {
+	setDragMotion(iconBox, y) {
 		let z_index;
 		
 		// 요소를 움직여주는 기능
 		const handleDrag = (e) => {
-			div.style.left = `${e.pageX-div.offsetWidth/2}px`;
-			div.style.top = `${e.pageY-div.offsetHeight/y}px`;
+			iconBox.style.left = `${e.pageX-iconBox.offsetWidth/2}px`;
+			iconBox.style.top = `${e.pageY-iconBox.offsetHeight/y}px`;
 		}
 
 		// 마우스를 눌렀을 때
 		const handleIconMousedown = (e) => {
-			z_index = div.style.zIndex;
-			div.style.zIndex = 9999;
-			div.addEventListener("mousemove", handleDrag);
+			z_index = iconBox.style.zIndex;
+			iconBox.style.zIndex = 9999;
+			iconBox.addEventListener("mousemove", handleDrag);
 
 			// 마우스를 때면 드래그이벤트 삭제
 			const handleIconMouseup = (e) => {
-				div.removeEventListener("mousemove", handleDrag);
-				div.style.zIndex = z_index;
+				iconBox.removeEventListener("mousemove", handleDrag);
+				iconBox.style.zIndex = z_index;
 			}
-			div.addEventListener("mouseup", handleIconMouseup);
+			iconBox.addEventListener("mouseup", handleIconMouseup);
 		}
-		div.addEventListener("mousedown", handleIconMousedown);
-		div.ondragstart = () => {
+		iconBox.addEventListener("mousedown", handleIconMousedown);
+		iconBox.ondragstart = () => {
 			return false;
 		}
 	}
@@ -124,19 +138,6 @@ class MyWindow {
 		
 		return iconDiv;
 	}
-
-	// 폴더인 경우 이벤트 처리
-	setFolder(iconBox) {
-		const handleDbclick = (e) => {
-			const newBox = document.createElement("div");
-			const currentWindow = document.querySelector("div.window:not(.disnone)");
-			newBox.className = "drag newContent";
-			newBox.innerText = e.target.dataset.iconname ?? e.target.innerText;
-			this.setDragMotion(newBox,2);
-			currentWindow.appendChild(newBox);
-		}
-		iconBox.addEventListener("dblclick", handleDbclick);
-	}
 };
 
 class Desktop extends MyWindow{
@@ -151,5 +152,20 @@ class Desktop extends MyWindow{
 	}
 	set myName(name) {
 		this.#myName = name;
+	}
+
+	initDesktop(isVisible) {
+		const desk = document.querySelector(".desktop");
+		const newWindow = document.createElement("div");
+		newWindow.className = "window";
+
+		const resultObject = super.buildContent();
+		for(let obj of resultObject) {
+			newWindow.appendChild(obj);
+		}
+		if(!isVisible) {
+			newWindow.classList.add("disnone");
+		}
+		desk.appendChild(newWindow);
 	}
 };

@@ -7,7 +7,7 @@
 	</head>
 	<body>
 		<header>
-			<button class="btn1">Desktop변경</button>
+			<button class="toggleBtn">Desktop변경</button>
 		</header>
 		<section class="desktop">
 		</section>
@@ -16,40 +16,21 @@
 			const desk = document.querySelector(".desktop");
 			const folderCount = 10;
 			const iconCount = 8;
-			const myDesktop1 = new Desktop(
-				/* TODO: myDesktop 인스턴스의 생성자의 변수로 무엇이 들어가야 할까요? */
-				folderCount, iconCount, "geonyeong"
-			);
-			const myDesktop2 = new Desktop(
-				folderCount+5, iconCount-2, "baek"
-			);
+			const desktopCount = 2;
+			const myDesktop1 = new Desktop(folderCount, iconCount, "geonyeong");
+			const myDesktop2 = new Desktop(folderCount+5, iconCount-2, "baek");
 			
-			const window1 = document.createElement("div");
-			window1.className = "window";
-			const resultChilds = myDesktop1.initContent();
-			for(child of resultChilds) {
-				window1.appendChild(child);
-			}
+			myDesktop1.initDesktop(true);
+			myDesktop2.initDesktop(false);
 
-			const window2 = document.createElement("div");
-			window2.className = "window";
-			window2.classList.add("disnone");
-			const resultChilds2 = myDesktop2.initContent();
-			for(child of resultChilds2) {
-				window2.appendChild(child);
-			}
-
-			desk.appendChild(window1);
-			desk.appendChild(window2);
-			
-			const btn1 = document.querySelector(".btn1");
-
+			const toggleBtn = document.querySelector(".toggleBtn");
+			const windowTemp = document.querySelectorAll("div.window")
 			const handleBtnClick = (e) => {
-				window1.classList.toggle("disnone");
-				window2.classList.toggle("disnone");
+				windowTemp.forEach((win) => {
+					win.classList.toggle("disnone");
+				})
 			}
-			btn1.addEventListener("click", handleBtnClick);
-
+			toggleBtn.addEventListener("click", handleBtnClick);
 		</script>
 	</body>
 </html>
