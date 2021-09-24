@@ -87,17 +87,18 @@ class MyWindow {
 	// Drag & Drop 기능
 	setDragMotion(iconBox, y) {
 		let z_index;
-		
-		// 요소를 움직여주는 기능
-		const handleDrag = (e) => {
-			iconBox.style.left = `${e.pageX-iconBox.offsetWidth/2}px`;
-			iconBox.style.top = `${e.pageY-iconBox.offsetHeight/y}px`;
-		}
 
 		// 마우스를 눌렀을 때
 		const handleIconMousedown = (e) => {
+			// 요소를 움직여주는 기능
+			const handleDrag = (e) => {
+				iconBox.style.left = `${e.pageX-iconBox.offsetWidth/2}px`;
+				iconBox.style.top = `${e.pageY-iconBox.offsetHeight/y}px`;
+			}
+
 			z_index = iconBox.style.zIndex;
 			iconBox.style.zIndex = 9999;
+			iconBox.style.position = 'absolute';
 			iconBox.addEventListener("mousemove", handleDrag);
 
 			// 마우스를 때면 드래그이벤트 삭제
@@ -105,9 +106,10 @@ class MyWindow {
 				iconBox.removeEventListener("mousemove", handleDrag);
 				iconBox.style.zIndex = z_index;
 			}
-			iconBox.addEventListener("mouseup", handleIconMouseup);
+			window.addEventListener("mouseup", handleIconMouseup);
 		}
-		iconBox.addEventListener("mousedown", handleIconMousedown);
+
+		window.addEventListener("mousedown", handleIconMousedown);
 		iconBox.ondragstart = () => {
 			return false;
 		}
@@ -154,6 +156,7 @@ class Desktop extends MyWindow{
 		this.#myName = name;
 	}
 
+	// Desktop요소 배치를 위한 init
 	initDesktop(isVisible) {
 		const desk = document.querySelector(".desktop");
 		const newWindow = document.createElement("div");
