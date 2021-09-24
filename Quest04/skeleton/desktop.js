@@ -49,50 +49,44 @@ class MyWindow {
 	#positionX = 10;
 	#positionY = 10;
 	constructor(iconCount, folderCount) {
-		const setFolders = [];
-		const setIcons = [];
-		let i = 0;
-		for(; i<iconCount; i++) {
-			setIcons.push(new Icon(`아이콘${i}`));
-		}
-		for(let j = 0; j<folderCount; j++) {
-			setFolders.push(new Folder(`폴더${j}`, `아이콘${i+j}`));
-		}
+		const setIcons = Array.from({length: iconCount}, (_, i) => new Icon(`아이콘${i}`));
+		const setFolders = Array.from({length: folderCount}, (_, i) => new Folder(`폴더${i}`,`아이콘${i+iconCount}`));
 		this.#folders = setFolders;
 		this.#icons = setIcons;
 	}
 
+	// 아이콘, 폴더를 화면안에 셋팅하는 함수
 	initContent() {
-		const childs = []
-		for(let i of this.#icons.concat(this.#folders)) {
-			const div = this.buildIcon(i);
-			this.setDragMotion(div,1);
-			if(i instanceof Folder) {
-				const handleDbclick = (e) => {
-					const div2 = document.createElement("div");
-					div2.className = "drag newContent";
-					div2.innerText = e.target.parentNode.childNodes[1].innerText;
-					//parentNode변경필요. ?문법
-					this.setDragMotion(div2,2);
-					e.target.parentNode.parentNode.appendChild(div2);
-				}
-				div.addEventListener("dblclick", handleDbclick);
+		const iconBoxes = []
+		const iconsAndFolders = this.#icons.concat(this.#folders);
+		for(let iconAndFolder of iconsAndFolders) {
+			const iconBox = this.buildIconBox(iconAndFolder);
+			this.setDragMotion(iconBox,1);
+			if(iconAndFolder instanceof Folder) {
+				this.setFolder(iconBox);
 			}
-			childs.push(div);
+			iconBoxes.push(iconBox);
 		}
-		return childs;
+		return iconBoxes;
 	}
 
+	// Drag & Drop 기능
 	setDragMotion(div, y) {
 		let z_index;
-		const handleDrag = (e) => { //template literals로 변경
+		
+		// 요소를 움직여주는 기능
+		const handleDrag = (e) => {
 			div.style.left = `${e.pageX-div.offsetWidth/2}px`;
 			div.style.top = `${e.pageY-div.offsetHeight/y}px`;
-		}// z-index
+		}
+
+		// 마우스를 눌렀을 때
 		const handleIconMousedown = (e) => {
 			z_index = div.style.zIndex;
 			div.style.zIndex = 9999;
 			div.addEventListener("mousemove", handleDrag);
+
+			// 마우스를 때면 드래그이벤트 삭제
 			const handleIconMouseup = (e) => {
 				div.removeEventListener("mousemove", handleDrag);
 				div.style.zIndex = z_index;
@@ -100,16 +94,17 @@ class MyWindow {
 			div.addEventListener("mouseup", handleIconMouseup);
 		}
 		div.addEventListener("mousedown", handleIconMousedown);
-		div.ondragstart = () => { // function -> arrow function
+		div.ondragstart = () => {
 			return false;
 		}
 	}
 
-	buildIcon(icon) {
-		const div = document.createElement("div");
-		div.className = "drag";
-		div.style.left = `${this.#positionX}px`;
-		div.style.top = `${this.#positionY}px`;
+	// 아이콘이미지와 자리 셋팅
+	buildIconBox(iconFolder) {
+		const iconDiv = document.createElement("div");
+		iconDiv.className = "drag";
+		iconDiv.style.left = `${this.#positionX}px`;
+		iconDiv.style.top = `${this.#positionY}px`;
 		if (this.#positionY <= 700) {
 			this.#positionY += 70;
 		} else {
@@ -117,16 +112,30 @@ class MyWindow {
 			this.#positionX += 70;
 		}
 		const iconImg = document.createElement("img");
-		const p = document.createElement("p");
+		const iconText = document.createElement("p");
 		iconImg.src = "http://gdimg.gmarket.co.kr/1733830715/still/280";
 		iconImg.className = "iconImg";
-		iconImg.style.width = `${icon.width}px`;
-		iconImg.style.height = `${icon.height}px`;
-		p.innerText = icon.folderName || icon.name;
-		div.appendChild(iconImg);
-		div.appendChild(p);
+		iconImg.style.width = `${iconFolder.width}px`;
+		iconImg.style.height = `${iconFolder.height}px`;
+		iconImg.dataset.iconname = iconFolder.folderName || iconFolder.name;
+		iconText.innerText = iconFolder.folderName || iconFolder.name;
+		iconDiv.appendChild(iconImg);
+		iconDiv.appendChild(iconText);
 		
-		return div;
+		return iconDiv;
+	}
+
+	// 폴더인 경우 이벤트 처리
+	setFolder(iconBox) {
+		const handleDbclick = (e) => {
+			const newBox = document.createElement("div");
+			const currentWindow = document.querySelector("div.window:not(.disnone)");
+			newBox.className = "drag newContent";
+			newBox.innerText = e.target.dataset.iconname ?? e.target.innerText;
+			this.setDragMotion(newBox,2);
+			currentWindow.appendChild(newBox);
+		}
+		iconBox.addEventListener("dblclick", handleDbclick);
 	}
 };
 

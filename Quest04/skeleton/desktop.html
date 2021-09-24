@@ -13,6 +13,7 @@
 		</section>
 
 		<script>
+			const desk = document.querySelector(".desktop");
 			const folderCount = 10;
 			const iconCount = 8;
 			const myDesktop1 = new Desktop(
@@ -22,8 +23,7 @@
 			const myDesktop2 = new Desktop(
 				folderCount+5, iconCount-2, "baek"
 			);
-			const desk = document.querySelector(".desktop");
-
+			
 			const window1 = document.createElement("div");
 			window1.className = "window";
 			const resultChilds = myDesktop1.initContent();
