@@ -49,6 +49,7 @@ class Button {
 		});
 	}
 
+	// 받아온 array에서 최대값을 반환.
 	getMaxId(arr) {
 		return arr.reduce((a, b) => Math.max(parseInt(a), parseInt(b)));
 	}
@@ -225,7 +226,7 @@ class MyWindow {
 	loadContent() {
 		const storage = Array.from({length: localStorage.length}, (_, i) => ({
 			title: localStorage.key(i),
-			content: this.getStorageItem(localStorage.key(i)).text
+			content: this.getStorageItem(localStorage.key(i))
 		}));
 		return storage;
 	}
@@ -289,9 +290,10 @@ class MyWindow {
 	}
 	
 	initTerminal() {
-		for(let notepad of this.#notepads) {
-			this.loadDropdownMenu(notepad.title);
-			this.setListAndNote(notepad.title, notepad.content);
+		const sortedNotes = this.#notepads.sort((a, b) => a.content.id - b.content.id);
+		for(let note of sortedNotes) {
+			this.loadDropdownMenu(note.title);
+			this.setListAndNote(note.title, note.content.text);
 		}
 		this.setDropMenuAction();
 		this.initNewFile();
