@@ -1,0 +1,30 @@
+* {
+	/* TODO: 필요한 CSS를 채워넣어 보세요! */
+}
+
+.form-floating {
+	margin-bottom: 10px;
+}
+
+textarea {
+	height: 500px !important;
+}
+
+.disNone {
+	display: none !important;
+}
+
+#btnGroup {
+	margin-top: 10px;
+}
+
+input#difBtn {
+	width: 200px;
+}
+
+.container {
+	margin-top: 30px;
+	padding: 20px 30px !important;
+	border: 0.5px solid rgb(67, 104, 173);
+	border-radius: 1%;
+}
