@@ -23,20 +23,24 @@ class Button {
 		return noteList;
 	}
 
+	toggleList(listTarget) {
+		const noteLinks = document.querySelectorAll("a.notelink");
+		noteLinks.forEach((notelink) => {
+			const textForm = document.querySelector(`.${notelink.id}Form`);
+			if(listTarget !== notelink.id) {
+				notelink.classList.remove("active");
+				textForm.classList.add("disNone");
+			} else {
+				notelink.classList.add("active");
+				textForm.classList.remove("disNone");
+			}
+		})
+	}
+
 	// 위의 리스트들 클릭이벤트 처리
 	setClickList(li) {
 		const clickButton = (e) => {
-			const noteLinks = document.querySelectorAll("a.notelink");
-			noteLinks.forEach((notelink) => {
-				const textForm = document.querySelector(`.${notelink.id}Form`);
-				if(e.target.id !== notelink.id) {
-					notelink.classList.remove("active");
-					textForm.classList.add("disNone");
-				} else {
-					notelink.classList.add("active");
-					textForm.classList.remove("disNone");
-				}
-			})
+			this.toggleList(e.target.id);
 		}
 		li.addEventListener("click", clickButton);
 	}
@@ -97,20 +101,33 @@ class Button {
 			const value = { text, id };
 			
 			localStorage[this.#title] = JSON.stringify(value);
-			alert("저장되었습니다.");
 		}
 		btn.addEventListener("click", handleSave);
+	}
+
+	// 해당 리스트부분과 textarea 제거
+	removeNote() {
+		const currentForm = document.querySelector(".noteForm:not(.disNone)");
+		const currentTitle = document.querySelector(`#${this.#title}`).parentNode;
+		currentForm.remove();
+		currentTitle.remove();
 	}
 
 	// 닫기버튼 이벤트처리
 	setClickClose(btn) {
 		const handleClose = (e) => {
-			const currentForm = document.querySelector(".noteForm:not(.disNone)");
-			const currentTitle = document.querySelector(`#${this.#title}`).parentNode;
-			currentForm.remove();
-			currentTitle.remove();
+			this.removeNote();
 		}
 		btn.addEventListener("click", handleClose);
+	}
+
+	// 삭제버튼 이벤트 처리
+	setClickDelete(btn) {
+		const handleDelete = (e) => {
+			this.removeNote();
+			localStorage.removeItem(this.#title);
+		}
+		btn.addEventListener("click", handleDelete);
 	}
 
 	// 버튼을 만들고 각 버튼에 맞는 이벤트 처리
@@ -125,6 +142,9 @@ class Button {
 				break;
 			case "저장":
 				this.setClickSave(btn);
+				break;
+			case "삭제":
+				this.setClickDelete(btn);
 				break;
 			default:
 				this.setClickDifSave(btn);
@@ -161,6 +181,7 @@ class Notepad extends Button{
 		btnGroup.id = "btnGroup";
 		const saveBtn = super.setButton("btn btn-outline-primary","저장");
 		const saveDifBtn = super.setButton("btn btn-outline-primary","다른이름으로 저장");
+		const deleteBtn = super.setButton("btn btn-outline-danger","삭제");
 		const closeBtn = super.setButton("btn btn-outline-danger","닫기");
 		const difInput = document.createElement("input");
 		difInput.type= "text";
@@ -169,6 +190,7 @@ class Notepad extends Button{
 		difInput.value = super.title;
 		btnGroup.appendChild(saveBtn);
 		btnGroup.appendChild(saveDifBtn);
+		btnGroup.appendChild(deleteBtn);
 		btnGroup.appendChild(closeBtn);
 		btnGroup.appendChild(difInput);
 
@@ -283,8 +305,9 @@ class MyWindow {
 	initNewFile() {
 		const openBtn = document.getElementById("openFile");
 		const handleOpenFile = (e) => {
-			const random = Math.floor(Math.random()*1000000+1);
-			this.setListAndNote(`tmp${random}`, "");
+			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
+			this.setListAndNote(random, "");
+			new Button().toggleList(random);
 		}
 		openBtn.addEventListener("click", handleOpenFile);
 	}
