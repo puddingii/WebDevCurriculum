@@ -1,4 +1,4 @@
-class NButton {
+class Button {
 	#title;
 	constructor(title) {
 		this.#title = title;
@@ -8,7 +8,7 @@ class NButton {
 	}
 
 	// haeder에 있는 리스트들 쓰기
-	initTitles() {
+	initTitleBtn() {
 		const noteList = document.createElement("li");
 		noteList.className = "nav-item notetab";
 
@@ -23,59 +23,91 @@ class NButton {
 		return noteList;
 	}
 
-	// 클릭이벤트 처리
+	// 위의 리스트들 클릭이벤트 처리
 	setClickList(li) {
 		const clickButton = (e) => {
-			if(e.target.classList.contains("notelink")) {
-				const noteLinks = document.querySelectorAll("a.notelink");
-				noteLinks.forEach((notelink) => {
-					if(e.target.id !== notelink.id) {
-						notelink.classList.remove("active");
-						document.querySelector(`.${notelink.id}Form`).style.display = "none";
-					}
-				})
-				e.target.classList.toggle("active");
-				document.querySelector(`.${this.#title}Form`).style.display = "";
-			}
+			const noteLinks = document.querySelectorAll("a.notelink");
+			noteLinks.forEach((notelink) => {
+				const textForm = document.querySelector(`.${notelink.id}Form`);
+				if(e.target.id !== notelink.id) {
+					notelink.classList.remove("active");
+					textForm.classList.add("disNone");
+				} else {
+					notelink.classList.add("active");
+					textForm.classList.remove("disNone");
+				}
+			})
 		}
 		li.addEventListener("click", clickButton);
 	}
 
+	getStorageId() {
+		return Array.from({length: localStorage.length}, (_, i) => {
+			const title = localStorage.key(i);
+			const content = JSON.parse(localStorage.getItem(title));
+			return content.id;
+		});
+	}
+
+	getMaxId(arr) {
+		return arr.reduce((a, b) => Math.max(parseInt(a), parseInt(b)));
+	}
+
 	// 다른이름으로 저장버튼 이벤트처리
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
-	setDifSave(btn) { 
-		btn.id = "difBtn";
+	setClickDifSave(difBtn) { 
+		difBtn.id = "difBtn";
 		const handleDifSave = (e) => {
-			const id = e.target.parentNode.querySelector("input").value;
-			const value = e.target.parentNode.parentNode.querySelector("textarea").value;
-			console.log(localStorage[id]);
+			const currentForm = document.querySelector(".noteForm:not(.disNone)");
+			const id = currentForm.querySelector("input").value;
+			const text = currentForm.querySelector("textarea").value;
 			if(localStorage[id]) {
-				alert("같은 이름의 파일이 있습니다!")
+				alert("같은 이름의 파일이 있습니다!");
 			} else {
-				localStorage[id] = value;
+				const value = {
+					text,
+					id: this.getMaxId(this.getStorageId()) + 1
+				}
+				localStorage[id] = JSON.stringify(value);
 				location.reload();
 			}
-			
 		}
-		btn.addEventListener("click", handleDifSave);
+		difBtn.addEventListener("click", handleDifSave);
 	}
 
 	// 저장버튼 이벤트처리
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
-	setSave(btn) {
+	setClickSave(btn) {
 		const handleSave = (e) => {
-			const text = e.target.parentNode.parentNode.querySelector("textarea").value;
-			localStorage[this.#title] = text;
+			const currentForm = document.querySelector(".noteForm:not(.disNone)");
+			const text = currentForm.querySelector("textarea").value;
+			const currentStatus = currentForm.querySelector("label");
+			currentStatus.innerText = "저장됨.";
+
+			const storage = this.getStorageId();
+			let id = 0;
+			if(storage.length !== 0) { // id값을 primary key로 잡기위함.
+				if(localStorage[this.#title]) {
+					id = JSON.parse(localStorage[this.#title]).id;
+				} else {
+					id = this.getMaxId(storage) + 1;
+				}
+			}
+			const value = { text, id };
+			
+			localStorage[this.#title] = JSON.stringify(value);
 			alert("저장되었습니다.");
 		}
 		btn.addEventListener("click", handleSave);
 	}
 
 	// 닫기버튼 이벤트처리
-	setClose(btn) {
+	setClickClose(btn) {
 		const handleClose = (e) => {
-			e.target.parentNode.parentNode.remove();
-			document.querySelector(`#${this.#title}`).parentNode.remove();
+			const currentForm = document.querySelector(".noteForm:not(.disNone)");
+			const currentTitle = document.querySelector(`#${this.#title}`).parentNode;
+			currentForm.remove();
+			currentTitle.remove();
 		}
 		btn.addEventListener("click", handleClose);
 	}
@@ -88,20 +120,20 @@ class NButton {
 		btn.innerText=innerText;
 		switch(innerText) {
 			case "닫기":
-				this.setClose(btn);
+				this.setClickClose(btn);
 				break;
 			case "저장":
-				this.setSave(btn);
+				this.setClickSave(btn);
 				break;
 			default:
-				this.setDifSave(btn);
+				this.setClickDifSave(btn);
 		}
 
 		return btn;
 	}
 }
 
-class Notepad extends NButton{
+class Notepad extends Button{
 	#content;
 	constructor(title, content = "") {
 		super(title);
@@ -116,50 +148,66 @@ class Notepad extends NButton{
 	// textarea생성과 textarea처리를 위한 버튼 생성
 	detectTextarea(textarea) {
 		const handleTextarea = (e) => {
-			e.target.parentNode.querySelector("label").innerText = "저장 안됨."
+			const currentForm = document.querySelector(".noteForm:not(.disNone)");
+			currentForm.querySelector("label").innerText = "저장 안됨."
 		}
 		textarea.addEventListener("input", handleTextarea);
 	}
 
-	initNotepad() {
-		const div = document.createElement("div");
-		div.className= `form-floating ${super.title}Form`;
-		const textarea = document.createElement("textarea");
-		textarea.className = "form-control";
-		textarea.id = super.title;
-		textarea.value = this.#content;
-		this.detectTextarea(textarea);
-		const label = document.createElement("label");
-		label.for = super.title;
-		label.innerText = "Write";
+	// 저장, 다른이름저장, 닫기 버튼 관리
+	setButtonGroup() {
 		const btnGroup = document.createElement("div");
 		btnGroup.id = "btnGroup";
 		const saveBtn = super.setButton("btn btn-outline-primary","저장");
 		const saveDifBtn = super.setButton("btn btn-outline-primary","다른이름으로 저장");
 		const closeBtn = super.setButton("btn btn-outline-danger","닫기");
-		const input = document.createElement("input");
-		input.type= "text";
-		input.className = "form-control";
-		input.id = "difBtn";
-		input.value = super.title;
-
-		div.appendChild(textarea);
-		div.appendChild(label);
+		const difInput = document.createElement("input");
+		difInput.type= "text";
+		difInput.className = "form-control";
+		difInput.id = "difBtn";
+		difInput.value = super.title;
 		btnGroup.appendChild(saveBtn);
 		btnGroup.appendChild(saveDifBtn);
 		btnGroup.appendChild(closeBtn);
-		btnGroup.appendChild(input);
-		div.appendChild(btnGroup);
-		div.style.display = "none";
+		btnGroup.appendChild(difInput);
 
-		return div;
+		return btnGroup;
+	}
+
+	// 텍스트 적을곳 셋팅
+	setTextarea() {
+		const textarea = document.createElement("textarea");
+		textarea.className = "form-control";
+		textarea.id = super.title;
+		textarea.value = this.#content;
+		this.detectTextarea(textarea);
+
+		return textarea;
+	}
+
+	// textarea, 버튼 등 셋팅
+	initNotepad() {
+		const contentForm = document.createElement("div");
+		contentForm.className= `form-floating ${super.title}Form noteForm disNone`;
+		const textarea = this.setTextarea();
+		const detectLabel = document.createElement("label");
+		detectLabel.for = super.title;
+		detectLabel.innerText = "Write";
+		const btnGroup = this.setButtonGroup();
+
+		contentForm.appendChild(textarea);
+		contentForm.appendChild(detectLabel);
+		contentForm.appendChild(btnGroup);
+
+		return contentForm;
 	}
 };
 
-class Terminal {
+class MyWindow {
 	#notepads
 	constructor() {
-		this.#notepads = this.loadContent();
+		const loadedContent = this.loadContent();
+		this.#notepads = loadedContent;
 	}
 	get notepads() {
 		return this.#notepads;
@@ -170,16 +218,16 @@ class Terminal {
 
 	// localStorage에서 text에 맞는 value 긁기. 
 	getStorageItem(text) {
-		return localStorage.getItem(text);
+		return JSON.parse(localStorage.getItem(text));
 	}
 
 	// localStorage 전체 읽기.
 	loadContent() {
-		const content = Array.from({length: localStorage.length}, (_, i) => ({
+		const storage = Array.from({length: localStorage.length}, (_, i) => ({
 			title: localStorage.key(i),
-			content: this.getStorageItem(localStorage.key(i))
+			content: this.getStorageItem(localStorage.key(i)).text
 		}));
-		return content;
+		return storage;
 	}
 	
 	// Dropdown에 localStorage내용물을 긁어와서 표시
@@ -200,11 +248,11 @@ class Terminal {
 		const notepad = document.querySelector(".notepad");
 		const note = new Notepad(id, value);
 		// button & textarea setting
-		const li = note.initTitles();
+		const titles = note.initTitleBtn();
 		const textForm = note.initNotepad();
-		navContainer.appendChild(li);
+		navContainer.appendChild(titles);
 		notepad.appendChild(textForm);
-		note.setClickList(li);
+		note.setClickList(titles);
 	}
 
 	// dropdown안에 있는 요소 클릭시 발생하는 이벤트설정. 
@@ -213,14 +261,14 @@ class Terminal {
 		const loadList = document.querySelectorAll(".dropdown-item");
 		const handleLoadList = (e) => {
 			e.preventDefault();
-			const currentList = document.querySelectorAll(".nav-link");
-			let isExisting = false;
+			const currentList = document.querySelectorAll(".notelink");
+			let isExisting = true;
 			currentList.forEach((item) => {
 				if(item.id === e.target.innerText) {
-					isExisting = true;
+					isExisting = false;
 				}
 			});
-			if(!isExisting) {
+			if(isExisting) {
 				const id = e.target.innerText;
 				this.setListAndNote(id, this.getStorageItem(id));
 			}

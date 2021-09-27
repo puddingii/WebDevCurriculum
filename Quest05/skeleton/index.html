@@ -11,26 +11,26 @@
 	</head>
 	<body>
 		<!-- TODO: 이 곳을 채워 클라이언트를 만들어 보세요 -->
-		<header>
-			<ul class="nav nav-tabs navContainer">
-				<div class="dropdown">
-					<button id= "openFile" type="button" class="btn btn-primary">새 파일</button>
-					<button class="btn btn-primary dropdown-toggle" type="button" id="ddButton" data-bs-toggle="dropdown" aria-expanded="false">
-						불러오기
-					</button>
-					<ul class="dropdown-menu" aria-labelledby="ddButton">
-					</ul>
-					<!-- <input type="text" class="form-control"  aria-describedby="button-addon2">
-					<button class="btn btn-outline-secondary" type="button" id="button-addon2">Button</button> -->
-				</div>
-			</ul>
-		</header>
-		<br>
-		<section class="notepad">
-		</section>
+		<div class="container">
+			<header>
+				<ul class="nav nav-tabs navContainer">
+					<div class="dropdown">
+						<button id= "openFile" type="button" class="btn btn-primary">새 파일</button>
+						<button class="btn btn-primary dropdown-toggle" type="button" id="ddButton" data-bs-toggle="dropdown" aria-expanded="false">
+							불러오기
+						</button>
+						<ul class="dropdown-menu" aria-labelledby="ddButton">
+						</ul>
+					</div>
+				</ul>
+			</header>
+			<br>
+			<section class="notepad">
+			</section>
+		</div>
 		<script>
-			let terminal = new Terminal();
-			terminal.initTerminal();
+			let mywindow = new MyWindow();
+			mywindow.initTerminal();
 		</script>
 	</body>
 </html>
