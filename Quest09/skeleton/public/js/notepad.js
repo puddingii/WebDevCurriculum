@@ -45,31 +45,28 @@ class Button {
 		li.addEventListener("click", clickButton);
 	}
 
-	getStorageId() {
-		return Array.from({length: localStorage.length}, (_, i) => {
-			const title = localStorage.key(i);
-			const content = JSON.parse(localStorage.getItem(title));
-			return content.id;
-		});
-	}
-
 	// 다른이름으로 저장버튼 이벤트처리
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setClickDifSave(difBtn) { 
 		difBtn.id = "difBtn";
-		const handleDifSave = (e) => {
+		const handleDifSave = async (e) => {
 			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
-			const id = currentForm.querySelector(".difInput").value;
+			const currentStatus = currentForm.querySelector("label");
+			const title = currentForm.querySelector(".difInput").value;
 			const text = currentForm.querySelector("textarea").value;
-			if(localStorage[id]) {
-				alert("같은 이름의 파일이 있습니다!");
-			} else {
-				const value = {
-					text,
-					id: this.getStorageId().length !== 0 ? this.getMaxId(this.getStorageId()) + 1 : 0
-				}
-				localStorage[id] = JSON.stringify(value);
+
+			const response = await fetch("http://localhost:8000/api/saveDifNote", {
+				method: "post",
+				headers: {
+					"Content-type": "application/json"
+				},
+				body: JSON.stringify({ text, title })
+			})
+			if(response.status === 201) {
 				location.reload();
+			} else {
+				alert("같은 이름의 파일이 있거나 통신오류입니다.");
+				currentStatus.innerText = "통신오류.";
 			}
 		}
 		difBtn.addEventListener("click", handleDifSave);
@@ -95,7 +92,6 @@ class Button {
 			} else {
 				currentStatus.innerText = "통신오류.";
 			}
-			
 		}
 		btn.addEventListener("click", handleSave);
 	}

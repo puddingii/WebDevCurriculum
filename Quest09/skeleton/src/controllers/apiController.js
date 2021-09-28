@@ -23,7 +23,7 @@ export const postSaveNote = (req, res) => {
         let id = 0;
         if(storage.length !== 0) { // id값을 primary key로 잡기위함.
             if(localStorage.getItem(title)) {
-                id = JSON.parse(localStorage.getItem(title)).id;
+                id = JSON.parse(localStorage[title]).id;
             } else {
                 id = getMaxId(storage) + 1;
             }
@@ -43,5 +43,22 @@ export const postDeleteNote = (req, res) => {
 };
 
 export const postDifSaveNote = (req, res) => {
-
+    const { 
+        body: { text, title } 
+    } = req;
+    try {
+        if(localStorage.getItem(title)) {
+            return res.sendStatus(400);
+        } else {
+            const value = {
+                text,
+                id: getStorageId().length !== 0 ? getMaxId(getStorageId()) + 1 : 0
+            }
+            localStorage.setItem(title, JSON.stringify(value));
+            console.log(localStorage.length);
+            return res.sendStatus(201);
+        }
+    } catch(e) {
+        return res.sendStatus(400);
+    }
 };

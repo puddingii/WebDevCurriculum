@@ -5,6 +5,6 @@ const apiRouter = express.Router();
 
 apiRouter.route("/saveNote").post(postSaveNote);
 apiRouter.route("/deleteNote").post(postDeleteNote);
-apiRouter.route("/difSaveNote").post(postDifSaveNote);
+apiRouter.route("/saveDifNote").post(postDifSaveNote);
 
 export default apiRouter;
