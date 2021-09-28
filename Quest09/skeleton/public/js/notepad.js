@@ -53,11 +53,6 @@ class Button {
 		});
 	}
 
-	// 받아온 array에서 최대값을 반환.
-	getMaxId(arr) {
-		return arr.reduce((a, b) => Math.max(parseInt(a), parseInt(b)));
-	}
-
 	// 다른이름으로 저장버튼 이벤트처리
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setClickDifSave(difBtn) { 
@@ -83,24 +78,24 @@ class Button {
 	// 저장버튼 이벤트처리
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setClickSave(btn) {
-		const handleSave = (e) => {
+		const handleSave = async (e) => {
 			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
 			const text = currentForm.querySelector("textarea").value;
 			const currentStatus = currentForm.querySelector("label");
-			currentStatus.innerText = "저장됨.";
 
-			const storage = this.getStorageId();
-			let id = 0;
-			if(storage.length !== 0) { // id값을 primary key로 잡기위함.
-				if(localStorage[this.#title]) {
-					id = JSON.parse(localStorage[this.#title]).id;
-				} else {
-					id = this.getMaxId(storage) + 1;
-				}
+			const response = await fetch("http://localhost:8000/api/saveNote", {
+				method: "post",
+				headers: {
+					"Content-type": "application/json"
+				},
+				body: JSON.stringify({ text, title: this.#title })
+			})
+			if(response.status === 201) {
+				currentStatus.innerText = "저장됨.";
+			} else {
+				currentStatus.innerText = "통신오류.";
 			}
-			const value = { text, id };
 			
-			localStorage[this.#title] = JSON.stringify(value);
 		}
 		btn.addEventListener("click", handleSave);
 	}
@@ -132,26 +127,22 @@ class Button {
 
 	// 버튼을 만들고 각 버튼에 맞는 이벤트 처리
 	setButton(className, innerText) {
-		const ROOT = "http://localhost:8000"
-		const submitBtn = document.createElement("input");
-		submitBtn.type = "submit";
+		const submitBtn = document.createElement("button");
+		submitBtn.type = "button";
 		submitBtn.className = className;
-		submitBtn.value = innerText;
+		submitBtn.innerText = innerText;
 		switch(innerText) {
 			case "닫기":
 				submitBtn.type = "button";
 				this.setClickClose(submitBtn);
 				break;
 			case "저장":
-				submitBtn.formAction = `${ROOT}/api/saveNote`;
 				this.setClickSave(submitBtn);
 				break;
 			case "삭제":
-				submitBtn.formAction = `${ROOT}/api/deleteNote`;
 				this.setClickDelete(submitBtn);
 				break;
 			default:
-				submitBtn.formAction = `${ROOT}/api/difSaveNote`;
 				this.setClickDifSave(submitBtn);
 		}
 
@@ -216,20 +207,15 @@ class Notepad extends Button{
 	// textarea, 버튼 등 셋팅
 	initNotepad() {
 		const contentDiv = document.createElement("div");
-		contentDiv.className= `${super.title}Form noteDiv disNone`;
-		const noteForm = document.createElement("form");
-		noteForm.method = "POST";
-		noteForm.className = "form-floating noteForm";
+		contentDiv.className= `form-floating ${super.title}Form noteDiv disNone`;
 		const textarea = this.setTextarea();
 		const detectLabel = document.createElement("label");
-		detectLabel.htmlFor = super.title;
 		detectLabel.innerText = "Write";
 		const btnGroup = this.setButtonGroup();
 
-		contentDiv.appendChild(noteForm);
-		noteForm.appendChild(textarea);
-		noteForm.appendChild(detectLabel);
-		noteForm.appendChild(btnGroup);
+		contentDiv.appendChild(textarea);
+		contentDiv.appendChild(detectLabel);
+		contentDiv.appendChild(btnGroup);
 
 		return contentDiv;
 	}
