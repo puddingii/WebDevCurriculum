@@ -63,15 +63,15 @@ class Button {
 	setClickDifSave(difBtn) { 
 		difBtn.id = "difBtn";
 		const handleDifSave = (e) => {
-			const currentForm = document.querySelector(".noteForm:not(.disNone)");
-			const id = currentForm.querySelector("input").value;
+			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
+			const id = currentForm.querySelector(".difInput").value;
 			const text = currentForm.querySelector("textarea").value;
 			if(localStorage[id]) {
 				alert("같은 이름의 파일이 있습니다!");
 			} else {
 				const value = {
 					text,
-					id: this.getMaxId(this.getStorageId()) + 1
+					id: this.getStorageId().length !== 0 ? this.getMaxId(this.getStorageId()) + 1 : 0
 				}
 				localStorage[id] = JSON.stringify(value);
 				location.reload();
@@ -84,7 +84,7 @@ class Button {
 	// dropdown리스트에 바로 안뜨기 때문에 reload로 넘김.
 	setClickSave(btn) {
 		const handleSave = (e) => {
-			const currentForm = document.querySelector(".noteForm:not(.disNone)");
+			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
 			const text = currentForm.querySelector("textarea").value;
 			const currentStatus = currentForm.querySelector("label");
 			currentStatus.innerText = "저장됨.";
@@ -107,7 +107,7 @@ class Button {
 
 	// 해당 리스트부분과 textarea 제거
 	removeNote() {
-		const currentForm = document.querySelector(".noteForm:not(.disNone)");
+		const currentForm = document.querySelector(".noteDiv:not(.disNone)");
 		const currentTitle = document.querySelector(`#${this.#title}`).parentNode;
 		currentForm.remove();
 		currentTitle.remove();
@@ -132,25 +132,30 @@ class Button {
 
 	// 버튼을 만들고 각 버튼에 맞는 이벤트 처리
 	setButton(className, innerText) {
-		const btn = document.createElement("button");
-		btn.type = "button";
-		btn.className=className;
-		btn.innerText=innerText;
+		const ROOT = "http://localhost:8000"
+		const submitBtn = document.createElement("input");
+		submitBtn.type = "submit";
+		submitBtn.className = className;
+		submitBtn.value = innerText;
 		switch(innerText) {
 			case "닫기":
-				this.setClickClose(btn);
+				submitBtn.type = "button";
+				this.setClickClose(submitBtn);
 				break;
 			case "저장":
-				this.setClickSave(btn);
+				submitBtn.formAction = `${ROOT}/api/saveNote`;
+				this.setClickSave(submitBtn);
 				break;
 			case "삭제":
-				this.setClickDelete(btn);
+				submitBtn.formAction = `${ROOT}/api/deleteNote`;
+				this.setClickDelete(submitBtn);
 				break;
 			default:
-				this.setClickDifSave(btn);
+				submitBtn.formAction = `${ROOT}/api/difSaveNote`;
+				this.setClickDifSave(submitBtn);
 		}
 
-		return btn;
+		return submitBtn;
 	}
 }
 
@@ -169,7 +174,7 @@ class Notepad extends Button{
 	// textarea생성과 textarea처리를 위한 버튼 생성
 	detectTextarea(textarea) {
 		const handleTextarea = (e) => {
-			const currentForm = document.querySelector(".noteForm:not(.disNone)");
+			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
 			currentForm.querySelector("label").innerText = "저장 안됨."
 		}
 		textarea.addEventListener("input", handleTextarea);
@@ -185,7 +190,7 @@ class Notepad extends Button{
 		const closeBtn = super.setButton("btn btn-outline-danger","닫기");
 		const difInput = document.createElement("input");
 		difInput.type= "text";
-		difInput.className = "form-control";
+		difInput.className = "form-control difInput";
 		difInput.id = "difBtn";
 		difInput.value = super.title;
 		btnGroup.appendChild(saveBtn);
@@ -210,19 +215,23 @@ class Notepad extends Button{
 
 	// textarea, 버튼 등 셋팅
 	initNotepad() {
-		const contentForm = document.createElement("div");
-		contentForm.className= `form-floating ${super.title}Form noteForm disNone`;
+		const contentDiv = document.createElement("div");
+		contentDiv.className= `${super.title}Form noteDiv disNone`;
+		const noteForm = document.createElement("form");
+		noteForm.method = "POST";
+		noteForm.className = "form-floating noteForm";
 		const textarea = this.setTextarea();
 		const detectLabel = document.createElement("label");
-		detectLabel.for = super.title;
+		detectLabel.htmlFor = super.title;
 		detectLabel.innerText = "Write";
 		const btnGroup = this.setButtonGroup();
 
-		contentForm.appendChild(textarea);
-		contentForm.appendChild(detectLabel);
-		contentForm.appendChild(btnGroup);
+		contentDiv.appendChild(noteForm);
+		noteForm.appendChild(textarea);
+		noteForm.appendChild(detectLabel);
+		noteForm.appendChild(btnGroup);
 
-		return contentForm;
+		return contentDiv;
 	}
 };
 
