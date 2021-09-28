@@ -114,9 +114,22 @@ class Button {
 
 	// 삭제버튼 이벤트 처리
 	setClickDelete(btn) {
-		const handleDelete = (e) => {
-			this.removeNote();
-			localStorage.removeItem(this.#title);
+		const handleDelete = async (e) => {
+			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
+			const currentStatus = currentForm.querySelector("label");
+
+			const response = await fetch("http://localhost:8000/api/deleteNote", {
+				method: "delete",
+				headers: {
+					"Content-type": "application/json"
+				},
+				body: JSON.stringify({ title: this.#title })
+			})
+			if(response.status === 200) {
+				this.removeNote();
+			} else {
+				currentStatus.innerText = "통신오류.";
+			}
 		}
 		btn.addEventListener("click", handleDelete);
 	}
@@ -220,8 +233,11 @@ class Notepad extends Button{
 class MyWindow {
 	#notepads
 	constructor() {
-		const loadedContent = this.loadContent();
-		this.#notepads = loadedContent;
+		return (async() => {
+			this.#notepads = await this.loadContent();
+
+			return this;
+		})();
 	}
 	get notepads() {
 		return this.#notepads;
@@ -230,17 +246,10 @@ class MyWindow {
 		this.#notepads = pads;
 	}
 
-	// localStorage에서 text에 맞는 value 긁기. 
-	getStorageItem(text) {
-		return JSON.parse(localStorage.getItem(text));
-	}
-
 	// localStorage 전체 읽기.
-	loadContent() {
-		const storage = Array.from({length: localStorage.length}, (_, i) => ({
-			title: localStorage.key(i),
-			content: this.getStorageItem(localStorage.key(i))
-		}));
+	async loadContent() { // 수정필요
+		const response = await fetch("http://localhost:8000/api/loadLocalhost");
+		const storage = response.json();
 		return storage;
 	}
 	
@@ -284,7 +293,7 @@ class MyWindow {
 			});
 			if(isExisting) {
 				const id = e.target.innerText;
-				this.setListAndNote(id, this.getStorageItem(id));
+				this.setListAndNote(id, JSON.parse(localStorage.getItem(id)));
 			}
 		}
 		loadList.forEach((item) => {

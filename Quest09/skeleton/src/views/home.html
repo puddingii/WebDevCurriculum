@@ -29,8 +29,10 @@
 			</section>
 		</div>
 		<script>
-			let mywindow = new MyWindow();
-			mywindow.initTerminal();
+			(async() => {
+				let mywindow = await new MyWindow();
+				mywindow.initTerminal();
+			})();
 		</script>
 	</body>
 </html>
