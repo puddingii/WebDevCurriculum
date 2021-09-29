@@ -27,7 +27,7 @@ appSetting(apiApp);
 clientApp.use("/", homeRouter);
 apiApp.use("/api", cors(), apiRouter);
 
-const handleListen = () => console.log(`Listening: http://localhost:${CLIENTPORT}`);
-const handleApiListen = () => console.log(`Listening: http://localhost:${APIPORT}`);
+const handleListen = () => console.log(`Home Listening: http://localhost:${CLIENTPORT}`);
+const handleApiListen = () => console.log(`Api Listening: http://localhost:${APIPORT}`);
 clientApp.listen(CLIENTPORT, handleListen);
 apiApp.listen(APIPORT,handleApiListen);

@@ -1,4 +1,4 @@
-class Button {
+class NoteButton {
 	#title;
 	constructor(title) {
 		this.#title = title;
@@ -23,6 +23,7 @@ class Button {
 		return noteList;
 	}
 
+	// 어떤 파일을 수정중인지 보여주기 위한 style설정
 	toggleList(listTarget) {
 		const noteLinks = document.querySelectorAll("a.notelink");
 		noteLinks.forEach((notelink) => {
@@ -89,6 +90,7 @@ class Button {
 			})
 			if(response.status === 201) {
 				currentStatus.innerText = "저장됨.";
+				location.reload();
 			} else {
 				currentStatus.innerText = "통신오류.";
 			}
@@ -127,6 +129,7 @@ class Button {
 			})
 			if(response.status === 200) {
 				this.removeNote();
+				location.reload();
 			} else {
 				currentStatus.innerText = "통신오류.";
 			}
@@ -159,7 +162,7 @@ class Button {
 	}
 }
 
-class Notepad extends Button{
+class Notepad extends NoteButton{
 	#content;
 	constructor(title, content = "") {
 		super(title);
@@ -231,24 +234,11 @@ class Notepad extends Button{
 };
 
 class MyWindow {
-	#notepads
-	constructor() {
-		return (async() => {
-			this.#notepads = await this.loadContent();
-
-			return this;
-		})();
-	}
-	get notepads() {
-		return this.#notepads;
-	}
-	set notepads(pads) {
-		this.#notepads = pads;
-	}
+	constructor() {}
 
 	// localStorage 전체 읽기.
 	async loadContent() { // 수정필요
-		const response = await fetch("http://localhost:8000/api/loadLocalhost");
+		const response = await fetch("http://localhost:8000/api/loadAllData");
 		const storage = response.json();
 		return storage;
 	}
@@ -258,11 +248,27 @@ class MyWindow {
 		const loadMenu = document.querySelector(".dropdown-menu");
 		const loadList = document.createElement("li");
 		const itemLink = document.createElement("a");
-		itemLink.className = "dropdown-item";
+		itemLink.className = `${value}Dropdown dropdown-item`;
 		itemLink.href="";
 		itemLink.innerText= value;
 		loadList.appendChild(itemLink);
 		loadMenu.appendChild(loadList);
+	}
+
+	// dropdown안에 있는 요소 클릭시 발생하는 이벤트설정. 
+	// 클릭시 만약 리스트에 없다면 setListAndNote를 사용해 불러옴.
+	setDropMenuAction(title) {
+		const dropdownItem = document.querySelector(`.${title}Dropdown`);
+		const handleLoadList = async (e) => {
+			e.preventDefault();
+
+			const id = e.target.innerText;
+			const storage = await this.loadContent();
+			const value = storage.find(item => item.title === id).content.text;
+			this.setListAndNote(id, value);
+		}
+
+		dropdownItem.addEventListener("click", handleLoadList);
 	}
 
 	// id와 value값으로 header쪽의 리스트와 textarea노트 생성
@@ -278,47 +284,27 @@ class MyWindow {
 		note.setClickList(titles);
 	}
 
-	// dropdown안에 있는 요소 클릭시 발생하는 이벤트설정. 
-	// 클릭시 만약 리스트에 없다면 setListAndNote를 사용해 불러옴.
-	setDropMenuAction() {
-		const loadList = document.querySelectorAll(".dropdown-item");
-		const handleLoadList = (e) => {
-			e.preventDefault();
-			const currentList = document.querySelectorAll(".notelink");
-			let isExisting = true;
-			currentList.forEach((item) => {
-				if(item.id === e.target.innerText) {
-					isExisting = false;
-				}
-			});
-			if(isExisting) {
-				const id = e.target.innerText;
-				this.setListAndNote(id, JSON.parse(localStorage.getItem(id)));
-			}
-		}
-		loadList.forEach((item) => {
-			item.addEventListener("click", handleLoadList);
-		});
-	}
-
 	// 파일 만들때 난수 생성해서 이름짓고 리스트추가 및 노트생성.(저장 안된상태)
 	initNewFile() {
 		const openBtn = document.getElementById("openFile");
 		const handleOpenFile = (e) => {
 			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
 			this.setListAndNote(random, "");
-			new Button().toggleList(random);
+			new NoteButton().toggleList(random);
 		}
 		openBtn.addEventListener("click", handleOpenFile);
 	}
 	
 	initTerminal() {
-		const sortedNotes = this.#notepads.sort((a, b) => a.content.id - b.content.id);
-		for(let note of sortedNotes) {
-			this.loadDropdownMenu(note.title);
-			this.setListAndNote(note.title, note.content.text);
-		}
-		this.setDropMenuAction();
-		this.initNewFile();
+		(async() => {
+			const notepads = await this.loadContent();
+			const sortedNotes = notepads.sort((a, b) => a.content.id - b.content.id);
+			for(let note of sortedNotes) {
+				this.loadDropdownMenu(note.title);
+				this.setListAndNote(note.title, note.content.text);
+				this.setDropMenuAction(note.title);
+			}
+			this.initNewFile();
+		})();
 	}
 };
