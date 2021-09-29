@@ -11,13 +11,17 @@ const getMaxId = (arr) => {
     return arr.reduce((a, b) => Math.max(parseInt(a), parseInt(b)));
 };
 
-// storage안에 있는 모든 아이템들 가져오기.
+// storage안에 있는 모든 아이템들 가져오기. 
 const getStorageItems = (isId) => {
-    return Array.from({length: localStorage.length}, (_, i) => {
+    let dataArr = Array.from({length: localStorage.length}, (_, i) => {
         const title = localStorage.key(i);
-        const content = getStorageItem(title);
-        return isId ? content.id : { title, content };
+        if(title !== "session") {
+            const content = getStorageItem(title);
+            return isId ? content.id : { title, content };
+        }
     });
+    dataArr = dataArr.filter((element) => element !== undefined);
+    return dataArr;
 };
 
 // 저장 눌렀을 때 서버에 데이터 저장
@@ -25,6 +29,7 @@ export const postSaveNote = (req, res) => {
     const { 
         body: { text, title } 
     } = req;
+
     try {
         const storage = getStorageItems(true);
         let id = 0;
@@ -36,8 +41,8 @@ export const postSaveNote = (req, res) => {
             }
         }
         const value = { text, id };
-        
         localStorage.setItem(title, JSON.stringify(value));
+        localStorage.setItem("session", title);
         return res.sendStatus(201);
     } catch(e) {
         return res.sendStatus(400);
@@ -50,9 +55,9 @@ export const postDeleteNote = (req, res) => {
     const { 
         body: { title } 
     } = req;
-
     try {
         localStorage.removeItem(title);
+        localStorage.setItem("session", "");
         return res.sendStatus(200);
     } catch(e) {
         return res.sendStatus(400);
@@ -72,8 +77,9 @@ export const postDifSaveNote = (req, res) => {
             const value = {
                 text,
                 id: getStorageItems(true).length !== 0 ? getMaxId(getStorageItems(true)) + 1 : 0
-            }
+            };
             localStorage.setItem(title, JSON.stringify(value));
+            localStorage.setItem("session", title);
             return res.sendStatus(201);
         }
     } catch(e) {
@@ -85,6 +91,7 @@ export const postDifSaveNote = (req, res) => {
 export const getLoadAllData = (req, res) => {
     try {
         const data = getStorageItems(false);
+        data.push({endTitle: localStorage.getItem("session") ?? ""});
         return res.status(201).json(data);
     } catch(e) {
         return res.sendStatus(400);

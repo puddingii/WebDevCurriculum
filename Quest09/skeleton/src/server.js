@@ -9,6 +9,9 @@ const CLIENTPORT = 3000;
 
 const clientApp = express();
 const apiApp = express();
+const corsOptions = {
+    origin: [/localhost:3000/],
+};
 
 const appSetting = (app) => {
     app.use("/static", express.static("public"));
@@ -18,14 +21,14 @@ const appSetting = (app) => {
     app.use("/node_modules", express.static("node_modules"));
 };
 
+appSetting(clientApp);
+appSetting(apiApp);
 clientApp.set("views", `${process.cwd()}/src/views`);
 clientApp.set("view engine", "ejs");
 clientApp.engine("html", require("ejs").renderFile);
-appSetting(clientApp);
-appSetting(apiApp);
 
 clientApp.use("/", homeRouter);
-apiApp.use("/api", cors(), apiRouter);
+apiApp.use("/api", cors(corsOptions), apiRouter);
 
 const handleListen = () => console.log(`Home Listening: http://localhost:${CLIENTPORT}`);
 const handleApiListen = () => console.log(`Api Listening: http://localhost:${APIPORT}`);

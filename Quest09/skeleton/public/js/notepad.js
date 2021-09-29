@@ -8,15 +8,16 @@ class NoteButton {
 	}
 
 	// haeder에 있는 리스트들 쓰기
-	initTitleBtn() {
+	initTitleBtn(endTitle) {
 		const noteList = document.createElement("li");
 		noteList.className = "nav-item notetab";
 
 		const noteLink = document.createElement("a");
 		noteLink.className = "nav-link notelink";
+		if(this.#title === endTitle) noteLink.classList.add("active");
 		noteLink.ariaCurrent = "page";
 		noteLink.href= "#";
-		noteLink.id = this.#title;
+		noteLink.id = `noteLink${this.#title}`;
 		noteLink.innerText = this.#title;
 		noteList.appendChild(noteLink);
 		
@@ -27,7 +28,7 @@ class NoteButton {
 	toggleList(listTarget) {
 		const noteLinks = document.querySelectorAll("a.notelink");
 		noteLinks.forEach((notelink) => {
-			const textForm = document.querySelector(`.${notelink.id}Form`);
+			const textForm = document.querySelector(`.Form${notelink.id.slice(8)}`);
 			if(listTarget !== notelink.id) {
 				notelink.classList.remove("active");
 				textForm.classList.add("disNone");
@@ -101,7 +102,7 @@ class NoteButton {
 	// 해당 리스트부분과 textarea 제거
 	removeNote() {
 		const currentForm = document.querySelector(".noteDiv:not(.disNone)");
-		const currentTitle = document.querySelector(`#${this.#title}`).parentNode;
+		const currentTitle = document.querySelector(`#noteLink${this.#title}`).parentNode;
 		currentForm.remove();
 		currentTitle.remove();
 	}
@@ -209,7 +210,7 @@ class Notepad extends NoteButton{
 	setTextarea() {
 		const textarea = document.createElement("textarea");
 		textarea.className = "form-control";
-		textarea.id = super.title;
+		textarea.id = `textarea${super.title}`;
 		textarea.value = this.#content;
 		this.detectTextarea(textarea);
 
@@ -217,12 +218,13 @@ class Notepad extends NoteButton{
 	}
 
 	// textarea, 버튼 등 셋팅
-	initNotepad() {
+	initNotepad(endTitle) {
 		const contentDiv = document.createElement("div");
-		contentDiv.className= `form-floating ${super.title}Form noteDiv disNone`;
+		contentDiv.className= `form-floating Form${super.title} noteDiv disNone`;
+		if(endTitle === super.title) contentDiv.classList.remove("disNone");
 		const textarea = this.setTextarea();
 		const detectLabel = document.createElement("label");
-		detectLabel.innerText = "Write";
+		detectLabel.innerText = "저장됨.";
 		const btnGroup = this.setButtonGroup();
 
 		contentDiv.appendChild(textarea);
@@ -235,11 +237,11 @@ class Notepad extends NoteButton{
 
 class MyWindow {
 	constructor() {}
-
+	#endNote;
 	// localStorage 전체 읽기.
 	async loadContent() { // 수정필요
 		const response = await fetch("http://localhost:8000/api/loadAllData");
-		const storage = response.json();
+		const storage = await response.json();
 		return storage;
 	}
 	
@@ -248,7 +250,7 @@ class MyWindow {
 		const loadMenu = document.querySelector(".dropdown-menu");
 		const loadList = document.createElement("li");
 		const itemLink = document.createElement("a");
-		itemLink.className = `${value}Dropdown dropdown-item`;
+		itemLink.className = `Dropdown${value} dropdown-item`;
 		itemLink.href="";
 		itemLink.innerText= value;
 		loadList.appendChild(itemLink);
@@ -258,7 +260,7 @@ class MyWindow {
 	// dropdown안에 있는 요소 클릭시 발생하는 이벤트설정. 
 	// 클릭시 만약 리스트에 없다면 setListAndNote를 사용해 불러옴.
 	setDropMenuAction(title) {
-		const dropdownItem = document.querySelector(`.${title}Dropdown`);
+		const dropdownItem = document.querySelector(`.Dropdown${title}`);
 		const handleLoadList = async (e) => {
 			e.preventDefault();
 
@@ -277,8 +279,8 @@ class MyWindow {
 		const notepad = document.querySelector(".notepad");
 		const note = new Notepad(id, value);
 		// button & textarea setting
-		const titles = note.initTitleBtn();
-		const textForm = note.initNotepad();
+		const titles = note.initTitleBtn(this.#endNote);
+		const textForm = note.initNotepad(this.#endNote);
 		navContainer.appendChild(titles);
 		notepad.appendChild(textForm);
 		note.setClickList(titles);
@@ -298,6 +300,7 @@ class MyWindow {
 	initTerminal() {
 		(async() => {
 			const notepads = await this.loadContent();
+			this.#endNote = notepads.pop().endTitle;
 			const sortedNotes = notepads.sort((a, b) => a.content.id - b.content.id);
 			for(let note of sortedNotes) {
 				this.loadDropdownMenu(note.title);
