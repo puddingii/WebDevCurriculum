@@ -8,7 +8,7 @@ class NoteButton {
 	}
 
 	// haeder에 있는 리스트들 쓰기
-	initTitleBtn(endTitle) {
+	addTitleBtn(endTitle) {
 		const noteList = document.createElement("li");
 		noteList.className = "nav-item notetab";
 
@@ -279,7 +279,7 @@ class MyWindow {
 		const notepad = document.querySelector(".notepad");
 		const note = new Notepad(id, value);
 		// button & textarea setting
-		const titles = note.initTitleBtn(this.#endNote);
+		const titles = note.addTitleBtn(this.#endNote);
 		const textForm = note.initNotepad(this.#endNote);
 		navContainer.appendChild(titles);
 		notepad.appendChild(textForm);
@@ -292,7 +292,7 @@ class MyWindow {
 		const handleOpenFile = (e) => {
 			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
 			this.setListAndNote(random, "");
-			new NoteButton().toggleList(random);
+			new NoteButton().toggleList(`noteLink${random}`);
 		}
 		openBtn.addEventListener("click", handleOpenFile);
 	}
