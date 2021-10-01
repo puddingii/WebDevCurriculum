@@ -13,7 +13,7 @@ const CLIENTPORT = 3000;
 const clientApp = express();
 const apiApp = express();
 const corsOptions = {
-    origin: [/localhost:3000/],
+    origin: [/localhost:3000/, /localhost:8000/],
 };
 const MysqlOptions = {
     host: "localhost",
@@ -37,7 +37,7 @@ clientApp.set("views", `${process.cwd()}/src/views`);
 clientApp.set("view engine", "ejs");
 clientApp.engine("html", require("ejs").renderFile);
 
-apiApp.use(session({
+clientApp.use(session({
     secret: "lksajdf3a3wporn3pinoflasd",
     resave: false,
     saveUninitialized: false,

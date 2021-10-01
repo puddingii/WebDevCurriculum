@@ -176,7 +176,7 @@ class Notepad extends NoteButton{
 		this.#content = con;
 	}
 	// textarea생성과 textarea처리를 위한 버튼 생성
-	detectTextarea(textarea) {
+	monitorTextarea(textarea) {
 		const handleTextarea = (e) => {
 			const currentForm = document.querySelector(".noteDiv:not(.disNone)");
 			currentForm.querySelector("label").innerText = "저장 안됨."
@@ -212,13 +212,13 @@ class Notepad extends NoteButton{
 		textarea.className = "form-control";
 		textarea.id = `textarea${super.title}`;
 		textarea.value = this.#content;
-		this.detectTextarea(textarea);
+		this.monitorTextarea(textarea);
 
 		return textarea;
 	}
 
 	// textarea, 버튼 등 셋팅
-	initNotepad(endTitle) {
+	setNotepadForm(endTitle) {
 		const contentDiv = document.createElement("div");
 		contentDiv.className= `form-floating Form${super.title} noteDiv disNone`;
 		if(endTitle === super.title) contentDiv.classList.remove("disNone");
@@ -258,7 +258,7 @@ class MyWindow {
 	}
 
 	// dropdown안에 있는 요소 클릭시 발생하는 이벤트설정. 
-	// 클릭시 만약 리스트에 없다면 setListAndNote를 사용해 불러옴.
+	// 클릭시 만약 리스트에 없다면 setHeaderList를 사용해 불러옴.
 	setDropMenuAction(title) {
 		const dropdownItem = document.querySelector(`.Dropdown${title}`);
 		const handleLoadList = async (e) => {
@@ -267,23 +267,30 @@ class MyWindow {
 			const id = e.target.innerText;
 			const storage = await this.loadContent();
 			const value = storage.find(item => item.title === id).content.text;
-			this.setListAndNote(id, value);
+			this.setHeaderList(id, value);
+			this.setNoteDiv(id, value);
 		}
 
 		dropdownItem.addEventListener("click", handleLoadList);
 	}
 
 	// id와 value값으로 header쪽의 리스트와 textarea노트 생성
-	setListAndNote(id, value) {
-		const navContainer = document.querySelector(".navContainer");
-		const notepad = document.querySelector(".notepad");
+	setHeaderList(id, value) {
 		const note = new Notepad(id, value);
 		// button & textarea setting
 		const titles = note.addTitleBtn(this.#endNote);
-		const textForm = note.initNotepad(this.#endNote);
-		navContainer.appendChild(titles);
-		notepad.appendChild(textForm);
 		note.setClickList(titles);
+
+		const navContainer = document.querySelector(".navContainer");
+		navContainer.appendChild(titles);
+	}
+
+	setNoteDiv(id, value) {
+		const note = new Notepad(id, value);
+		const textForm = note.setNotepadForm(this.#endNote);
+
+		const notepad = document.querySelector(".notepad");
+		notepad.appendChild(textForm);
 	}
 
 	// 파일 만들때 난수 생성해서 이름짓고 리스트추가 및 노트생성.(저장 안된상태)
@@ -291,7 +298,8 @@ class MyWindow {
 		const openBtn = document.getElementById("openFile");
 		const handleOpenFile = (e) => {
 			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
-			this.setListAndNote(random, "");
+			this.setHeaderList(random, "");
+			this.setNoteDiv(random, "");
 			new NoteButton().toggleList(`noteLink${random}`);
 		}
 		openBtn.addEventListener("click", handleOpenFile);
@@ -304,7 +312,8 @@ class MyWindow {
 			const sortedNotes = notepads.sort((a, b) => a.content.id - b.content.id);
 			for(let note of sortedNotes) {
 				this.loadDropdownMenu(note.title);
-				this.setListAndNote(note.title, note.content.text);
+				this.setHeaderList(note.title, note.content.text);
+				this.setNoteDiv(note.title, note.content.text);
 				this.setDropMenuAction(note.title);
 			}
 			this.initNewFile();

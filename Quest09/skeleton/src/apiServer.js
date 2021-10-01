@@ -10,7 +10,7 @@ const APIPORT = 8000;
 
 const apiApp = express();
 const corsOptions = {
-    origin: [/localhost:3000/],
+    origin: [/localhost:3000/, /localhost:8000/],
 };
 const MysqlOptions = {
     host: "localhost",
@@ -33,7 +33,7 @@ apiApp.use(session({
     secret: "lksajdf3a3wporn3pinoflasd",
     resave: false,
     saveUninitialized: false,
-    // store: new MySQLStore(MysqlOptions)
+    store: new MySQLStore(MysqlOptions)
 }));
 
 apiApp.use("/api", cors(corsOptions), apiRouter);
