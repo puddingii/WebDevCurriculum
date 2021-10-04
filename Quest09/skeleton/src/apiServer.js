@@ -33,7 +33,7 @@ apiApp.use(session({
     secret: "lksajdf3a3wporn3pinoflasd",
     resave: false,
     saveUninitialized: false,
-    store: new MySQLStore(MysqlOptions)
+    // store: new MySQLStore(MysqlOptions)
 }));
 
 apiApp.use("/api", cors(corsOptions), apiRouter);

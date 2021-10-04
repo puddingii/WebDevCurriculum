@@ -310,6 +310,7 @@ class MyWindow {
 			const notepads = await this.loadContent();
 			this.#endNote = notepads.pop().endTitle;
 			const sortedNotes = notepads.sort((a, b) => a.content.id - b.content.id);
+			console.log(sortedNotes);
 			for(let note of sortedNotes) {
 				this.loadDropdownMenu(note.title);
 				this.setHeaderList(note.title, note.content.text);
