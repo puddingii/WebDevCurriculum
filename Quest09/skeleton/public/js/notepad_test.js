@@ -7,14 +7,43 @@ class MyLocalStorage {
 		return storage;
 	}
 
-	// async getValueOfKey(key) {
-	// 	const allData = await this.loadContent();
-	// 	return allData.find((element) => element.title === key);
-	// }
+	async deleteContent(title) {
+		const response = await fetch("http://localhost:8000/api/deleteNote", {
+			method: "delete",
+			headers: {
+				"Content-type": "application/json"
+			},
+			body: JSON.stringify({ title })
+		});
+		return response;
+	}
+
+	async saveContent(title, text) {
+		const response = await fetch("http://localhost:8000/api/saveNote", {
+			method: "post",
+			headers: {
+				"Content-type": "application/json"
+			},
+			body: JSON.stringify({ title, text })
+		});
+		return response;
+	}
+
+	async saveAsContent(title, text) {
+		const response = await fetch("http://localhost:8000/api/saveDifNote", {
+			method: "post",
+			headers: {
+				"Content-type": "application/json"
+			},
+			body: JSON.stringify({ title, text })
+		});
+		return response;
+	}
 }
 
 class NoteButton {
     #type;
+	myLocalStorage = new MyLocalStorage();
 	constructor(type) {
         this.#type = type;
     }
@@ -23,32 +52,76 @@ class NoteButton {
     }
 
     // 버튼을 만들고 각 버튼에 맞는 이벤트 처리
-	setButtons(className) {
+	setButton(className) {
 		const submitBtn = document.createElement("button");
 		submitBtn.type = "button";
 		submitBtn.className = className;
+		submitBtn.id = this.#type;
 		submitBtn.innerText = this.#type;
 		switch(this.#type) {
-			case "close":
-				submitBtn.type = "button";
-				// this.clickClose(submitBtn);
-				break;
 			case "save":
-				// this.clickSave(submitBtn);
+				this.clickSave(submitBtn);
 				break;
 			case "delete":
-				// this.clickDelete(submitBtn);
+				this.clickDelete(submitBtn);
 				break;
-			default:
-				// this.clickDifSave(submitBtn);
+			case "saveAs":
+				this.clickSaveAs(submitBtn);
 		}
-
 		return submitBtn;
+	}
+
+	clickSave(btn, dicValue) {
+		const handleSave = async (e) => {
+			const textarea = document.getElementById("textareaForm");
+			const { 
+				dataset: {currentid: title},
+				value
+			} = textarea;
+			const response = await this.myLocalStorage.saveContent(title, value);
+			if(response.status === 201) {
+				location.reload();
+			} else {
+				alert("통신오류.");
+			}
+		}
+		btn.addEventListener("click", handleSave);
+	}
+
+	clickDelete(btn, dicValue) {
+		const handleDelete = async (e) => {
+			const textarea = document.getElementById("textareaForm");
+			const { 
+				dataset: {currentid: title},
+			} = textarea;
+			const response = await this.myLocalStorage.deleteContent(title)
+			if(response.status === 200) {
+				location.reload();
+			} else {
+				alert("통신오류.");
+			}
+		}
+		btn.addEventListener("click", handleDelete);
+	}
+
+	clickSaveAs(btn, saveAsInput, dicValue) { 
+		const handleSaveAs = async (e) => {
+			const textarea = document.getElementById("textareaForm");
+			const title = document.getElementById("saveAsInput").value;
+			const response = await this.myLocalStorage.saveAsContent(title, textarea.value);
+			if(response.status === 201) {
+				location.reload();
+			} else {
+				alert("같은 이름의 파일이 있거나 통신오류입니다.");
+			}
+		}
+		btn.addEventListener("click", handleSaveAs);
 	}
 }
 
-class Notepad {
+class NotepadForm {
     #noteName;
+	myLocalStorage = new MyLocalStorage();
 	constructor(noteName) {
         this.#noteName = noteName;
     }
@@ -62,7 +135,7 @@ class Notepad {
     // textarea생성과 textarea처리를 위한 버튼 생성
     monitorTextarea(textarea) {
         const handleTextarea = (e) => {
-            textarea.querySelector("label").innerText = "저장 안됨."
+            document.getElementById("textareaLabel").innerText = "저장 안됨."
         }
         textarea.addEventListener("input", handleTextarea);
     }
@@ -76,61 +149,30 @@ class Notepad {
         noteArea.value = content;
 		this.monitorTextarea(noteArea);
 
-		return textarea;
+		return noteArea;
 	}
 
 	// textarea value 설정
 	loadTextareaValue(content = "") {
-		const noteArea = document.querySelector("textarea");
+		const noteArea = document.getElementById("textareaForm");
 		noteArea.value = content;
 		noteArea.dataset.currentid = this.#noteName;
+
+		const saveAsInput = document.getElementById("saveAsInput");
+		saveAsInput.value = this.#noteName;
 	}
-
-    // 저장, 다른이름저장, 닫기 버튼 관리
-	setButtonGroup() {
-		const btnGroup = document.createElement("div");
-		btnGroup.id = "btnGroup";
-		const saveBtn = new NoteButton("save").setButton("btn btn-outline-primary");
-		const saveDifBtn = new NoteButton("saveAs").setButton("btn btn-outline-primary","saveAs");
-		const deleteBtn = new NoteButton("delete").setButton("btn btn-outline-danger","delete");
-		const closeBtn = new NoteButton("close").setButton("btn btn-outline-danger","close");
-		const saveDifInput = document.createElement("input");
-		saveDifInput.type= "text";
-		saveDifInput.className = "form-control difInput";
-		saveDifInput.value = this.#noteName;
-		btnGroup.appendChild(saveBtn);
-		btnGroup.appendChild(saveDifBtn);
-		btnGroup.appendChild(deleteBtn);
-		btnGroup.appendChild(closeBtn);
-		btnGroup.appendChild(difInput);
-
-		return btnGroup;
-	}
-
-    // textarea + button
-    setNotepad() {
-        const noteForm = document.createElement("div");
-        noteForm.className = `form-floating disNone noteDiv`;
-        const textArea = this.setTextarea();
-        const btnGroup = this.setButtonGroup();
-        const detectLabel = document.createElement("label");
-		detectLabel.innerText = "저장됨.";
-
-        noteForm.appendChild(textArea);
-        noteForm.appendChild(detectLabel);
-        noteForm.appendChild(btnGroup);
-
-        return noteForm;
-    }
 }
 
-class NotepadHeader extends Notepad{
+class Notepad extends NotepadForm{
 	#noteNameList = [];
-    constructor(noteName) {
+    constructor(noteName = "") {
 		return (async() => {
 			super(noteName);
 			this.#noteNameList = await new MyLocalStorage().loadContent();
-
+			const endTitle = this.#noteNameList.pop().endTitle;
+			this.noteName = this.#noteNameList.length !== 0 ? endTitle : "";
+			this.#noteNameList.sort((a, b) => a.content.id - b.content.id);
+			
 			return this;
 		})();
 	}
@@ -143,40 +185,61 @@ class NotepadHeader extends Notepad{
 	}
 
     // Dropdown에 리스트들 표시
-	addDropdownMenu(value, classOfMenu) {
+	addDropdownItem(value, classOfMenu) {
 		const dropdownMenu = document.querySelector(classOfMenu); // .dropdown-menu
 		const dropdownItem = document.createElement("li");
 		const itemLink = document.createElement("a");
 		itemLink.className = `Dropdown${value} dropdown-item`;
-		itemLink.href="";
+		itemLink.href="#";
 		itemLink.innerText= value;
 		dropdownItem.appendChild(itemLink);
+		this.clickDropdownItem(dropdownItem);
 		dropdownMenu.appendChild(dropdownItem);
+	}
+
+	clickDropdownItem(item) {
+		const handleLoadList = async (e) => {
+			const title = e.target.innerText;
+			// list에 아이템추가와 textarea셋팅해야함.
+			this.addItemAtList(".navContainer", title);
+			super.loadTextareaValue(this.#noteNameList.find((element) => element.title === title).content.text);
+		}
+
+		item.addEventListener("click", handleLoadList);
 	}
 
 	// 리스트 클릭 이벤트(값 찾아와서 textarea에 적용)
 	setClickList(list) {
 		const handleList = async (e) => {
 			const itemName = e.target.dataset.currentid;
-			this.toggleList(itemName, "a.notelink");
+			const getBeforeValue = this.#noteNameList.findIndex((element) => element.title === this.noteName);
+			const noteDiv = document.getElementById("noteDiv");
+			noteDiv.classList.remove("disNone");
 
-			const getValue = this.#noteNameList.find((element) => element.title === itemName);
-			super.loadTextareaValue(getValue.content); // textarea에 값 셋팅해야함
+			const textarea = document.getElementById("textareaForm");
+			if(getBeforeValue !== -1) this.#noteNameList[getBeforeValue].content.text = textarea.value; // notelist에서 해당 content값 수정
+			this.toggleList(`noteName${itemName}`, "a.notelink");
+			this.noteName = itemName; // 클릭한 거 가르키기
+			
+			const getAfterValue = this.#noteNameList.findIndex((element) => element.title === itemName);
+			super.loadTextareaValue(this.#noteNameList[getAfterValue].content.text); // textarea에 값 셋팅해야함
 		}
 		list.addEventListener("click", handleList);
 	}
 
     // haeder에 있는 리스트에 notepad이름들 추가
-	addTitleBtn() {
+	setTitle(name) {
 		const noteList = document.createElement("li");
 		noteList.className = "nav-item notetab";
+		noteList.id = `noteList${name}`;
 
 		const noteLink = document.createElement("a");
 		noteLink.className = "nav-link notelink";
 		noteLink.ariaCurrent = "page";
 		noteLink.href= "#";
-		noteLink.dataset.currentid = this.#noteName;
-		noteLink.innerText = this.#noteName;
+		noteLink.dataset.currentid = name;
+		noteLink.id = `noteName${name}`;
+		noteLink.innerText = name;
 		noteList.appendChild(noteLink);
 		
 		return noteList;
@@ -195,13 +258,23 @@ class NotepadHeader extends Notepad{
 	}
 
 	// noteName값으로 header쪽의 리스트 생성
-	addItemOfList() {
-		// button & textarea setting
-		const item = this.addTitleBtn();
-		super.setClickList(item); // 클릭이벤트
+	addItemAtList(classOfList, value) {
+		// header setting
+		const item = this.setTitle(value);
+		this.setClickList(item); // 클릭이벤트
 
-		const navContainer = document.querySelector(".navContainer");
+		const navContainer = document.querySelector(classOfList);
 		navContainer.appendChild(item);
+	}
+
+	initItemAtList(classOfList) {
+		const navContainer = document.querySelector(classOfList);
+		this.#noteNameList.forEach((item) => {
+			const list = this.setTitle(item.title);
+			this.setClickList(list); // 클릭이벤트
+			navContainer.appendChild(list);
+			if(this.noteName === item.title) this.toggleList(`noteName${item.title}`, "a.notelink");
+		})
 	}
 
 	// 파일 만들때 난수 생성해서 이름짓고 리스트추가(저장 안된상태)
@@ -209,16 +282,87 @@ class NotepadHeader extends Notepad{
 		const openBtn = document.getElementById("openFile");
 		const handleOpenFile = (e) => {
 			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
-			this.#noteName = random;
-			this.addItemOfList(); // header 생성 필요(textarea는 필요x).
-			//this.setNoteDiv(random, "");
-			//this.toggleList(`noteLink${random}`, "a.notelink");
+			this.#noteNameList.push({
+				title: random,
+				content: {
+					text: "",
+					id: this.#noteNameList[this.#noteNameList.length]
+				}
+			});
+			this.addItemAtList(".navContainer", random);
 		}
 		openBtn.addEventListener("click", handleOpenFile);
 	}
+
+	// 저장, 다른이름저장, 닫기 버튼 관리
+	setButtonGroup() {
+		const btnGroup = document.createElement("div");
+		btnGroup.id = "btnGroup";
+
+		const textareaId = document.getElementById("textareaForm").dataset.currentid;
+		const data = { title: this.noteName, textId: textareaId}
+		const saveBtn = new NoteButton("save").setButton("btn btn-outline-primary", data);
+		const saveAsBtn = new NoteButton("saveAs").setButton("btn btn-outline-primary", data);
+		const deleteBtn = new NoteButton("delete").setButton("btn btn-outline-danger", data);
+		const closeBtn = new NoteButton("close").setButton("btn btn-outline-danger", data);
+		const handleClose = (e) => {
+			const textarea = document.getElementById("noteDiv");
+			textarea.classList.add("disNone");
+
+			const item = document.getElementById(`noteList${this.noteName}`);
+			this.noteName = "";
+			item.remove();
+		}
+		closeBtn.addEventListener("click", handleClose);
+		const saveAsInput = document.createElement("input");
+		saveAsInput.type= "text";
+		saveAsInput.className = "form-control";
+		saveAsInput.id = "saveAsInput";
+		saveAsInput.value = this.noteName;
+
+		btnGroup.appendChild(saveBtn);
+		btnGroup.appendChild(saveAsBtn);
+		btnGroup.appendChild(deleteBtn);
+		btnGroup.appendChild(closeBtn);
+		btnGroup.appendChild(saveAsInput);
+
+		return btnGroup;
+	}
+
+    // textarea + button
+    setNotepadForm(mainSection) {
+        const noteForm = document.createElement("div");
+        noteForm.className = "form-floating";
+		if(!this.noteName) noteForm.classList.add("disNone");
+		noteForm.id = "noteDiv";
+
+		const noteNameIndex = this.#noteNameList.findIndex((element) => element.title === this.noteName);
+        const textArea = noteNameIndex !== -1 ? super.setTextarea(this.#noteNameList[noteNameIndex].content.text) : super.setTextarea();
+        noteForm.appendChild(textArea);
+		
+        const detectLabel = document.createElement("label");
+		detectLabel.innerText = "저장됨.";
+		detectLabel.id = "textareaLabel";
+        noteForm.appendChild(detectLabel);
+		mainSection.appendChild(noteForm);
+
+		const btnGroup = this.setButtonGroup();
+        noteForm.appendChild(btnGroup);
+		mainSection.appendChild(noteForm);
+    }
 }
 
 class MyWindow {
 	constructor() {}
 
+	async initMyWindow() {
+		const myNotepad = await new Notepad();
+		myNotepad.initItemAtList(".navContainer");
+		const mainSection = document.querySelector("section.notepad");
+		myNotepad.setNotepadForm(mainSection);
+		myNotepad.clickNewFile();
+		myNotepad.noteNameList.forEach((note) => {
+			myNotepad.addDropdownItem(note.title ,".dropdown-menu");
+		})
+	}
 }

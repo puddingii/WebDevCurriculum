@@ -93,8 +93,8 @@ export const postDifSaveNote = (req, res) => {
 export const getLoadAllData = (req, res) => {
     try {
         const data = getStorageItems(false);
-        console.log( req.session.endTitle);
-        data.push({endTitle: req.session.endTitle ?? ""});
+        data.push({endTitle: localStorage.getItem("session") ?? ""});
+        console.log(data);
         return res.status(201).json(data);
     } catch(e) {
         return res.sendStatus(400);

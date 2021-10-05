@@ -3,7 +3,8 @@
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="/static/css/style.css">
-		<script src="/static/js/notepad.js"></script>
+		<!-- <script src="/static/js/notepad.js"></script> -->
+		<script src="/static/js/notepad_test.js"></script>
 		<!-- CSS only -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
 		<!-- JavaScript Bundle with Popper -->
@@ -29,8 +30,12 @@
 			</section>
 		</div>
 		<script>
-			let mywindow = new MyWindow();
-			mywindow.initTerminal();
+			// let mywindow = new MyWindow();
+			// mywindow.initTerminal();
+			(async() =>{
+				const testWindow = new MyWindow();
+				await testWindow.initMyWindow();
+			})();
 		</script>
 	</body>
 </html>
