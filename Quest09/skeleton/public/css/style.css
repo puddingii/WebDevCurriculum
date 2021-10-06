@@ -18,9 +18,44 @@ input#difBtn {
 	width: 200px;
 }
 
-.container {
+.childContainer {
 	margin-top: 30px;
 	padding: 20px 30px !important;
 	border: 0.5px solid rgb(67, 104, 173);
 	border-radius: 1%;
+}
+
+.card {
+	margin-top: 30px !important;
+	align-items: center;
+}
+.card-text {
+	font-weight: bold;
+}
+
+@keyframes goAway {
+	from {
+		transform: none;
+		opacity: 1;
+	}
+	to {
+		transform: translateY(-50px);
+		opacity: 0;
+	}
+}
+
+.message {
+	position: absolute;
+	top: 10px;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	max-width: 200px;
+	padding: 10px 20px;
+	border-radius: 10000px;
+	text-align: center;
+	animation: goAway 0.5s ease-in-out forwards;
+	animation-delay: 5s;
+	background-color: aquamarine;
+	color: black;
 }

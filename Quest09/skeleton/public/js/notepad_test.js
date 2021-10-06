@@ -1,46 +1,3 @@
-class MyLocalStorage {
-	constructor() {}
-
-	async loadContent() {
-		const response = await fetch("http://localhost:8000/api/loadAllData");
-		const storage = await response.json();
-		return storage;
-	}
-
-	async deleteContent(title) {
-		const response = await fetch("http://localhost:8000/api/deleteNote", {
-			method: "delete",
-			headers: {
-				"Content-type": "application/json"
-			},
-			body: JSON.stringify({ title })
-		});
-		return response;
-	}
-
-	async saveContent(title, text) {
-		const response = await fetch("http://localhost:8000/api/saveNote", {
-			method: "post",
-			headers: {
-				"Content-type": "application/json"
-			},
-			body: JSON.stringify({ title, text })
-		});
-		return response;
-	}
-
-	async saveAsContent(title, text) {
-		const response = await fetch("http://localhost:8000/api/saveDifNote", {
-			method: "post",
-			headers: {
-				"Content-type": "application/json"
-			},
-			body: JSON.stringify({ title, text })
-		});
-		return response;
-	}
-}
-
 class NoteButton {
     #type;
 	myLocalStorage = new MyLocalStorage();
@@ -71,7 +28,7 @@ class NoteButton {
 		return submitBtn;
 	}
 
-	clickSave(btn, dicValue) {
+	clickSave(btn) {
 		const handleSave = async (e) => {
 			const textarea = document.getElementById("textareaForm");
 			const { 
@@ -88,7 +45,7 @@ class NoteButton {
 		btn.addEventListener("click", handleSave);
 	}
 
-	clickDelete(btn, dicValue) {
+	clickDelete(btn) {
 		const handleDelete = async (e) => {
 			const textarea = document.getElementById("textareaForm");
 			const { 
@@ -104,7 +61,7 @@ class NoteButton {
 		btn.addEventListener("click", handleDelete);
 	}
 
-	clickSaveAs(btn, saveAsInput, dicValue) { 
+	clickSaveAs(btn) { 
 		const handleSaveAs = async (e) => {
 			const textarea = document.getElementById("textareaForm");
 			const title = document.getElementById("saveAsInput").value;
@@ -200,29 +157,40 @@ class Notepad extends NotepadForm{
 	clickDropdownItem(item) {
 		const handleLoadList = async (e) => {
 			const title = e.target.innerText;
-			// list에 아이템추가와 textarea셋팅해야함.
-			this.addItemAtList(".navContainer", title);
+			const items = document.querySelectorAll(".notelink");
+			let isTitleInList = false;
+			items.forEach((element) => {
+				if(element.dataset.currentid === title) {
+					isTitleInList = true;
+					return;
+				}
+			});
+			if(!isTitleInList) this.addItemAtList("navContainer", title);
+			this.clickList(title);
 			super.loadTextareaValue(this.#noteNameList.find((element) => element.title === title).content.text);
 		}
 
 		item.addEventListener("click", handleLoadList);
 	}
 
-	// 리스트 클릭 이벤트(값 찾아와서 textarea에 적용)
-	setClickList(list) {
-		const handleList = async (e) => {
-			const itemName = e.target.dataset.currentid;
-			const getBeforeValue = this.#noteNameList.findIndex((element) => element.title === this.noteName);
-			const noteDiv = document.getElementById("noteDiv");
-			noteDiv.classList.remove("disNone");
+	clickList(currentid) {
+		const getBeforeValue = this.#noteNameList.findIndex((element) => element.title === this.noteName);
+		const noteDiv = document.getElementById("noteDiv");
+		noteDiv.classList.remove("disNone");
 
-			const textarea = document.getElementById("textareaForm");
-			if(getBeforeValue !== -1) this.#noteNameList[getBeforeValue].content.text = textarea.value; // notelist에서 해당 content값 수정
-			this.toggleList(`noteName${itemName}`, "a.notelink");
-			this.noteName = itemName; // 클릭한 거 가르키기
-			
-			const getAfterValue = this.#noteNameList.findIndex((element) => element.title === itemName);
-			super.loadTextareaValue(this.#noteNameList[getAfterValue].content.text); // textarea에 값 셋팅해야함
+		const textarea = document.getElementById("textareaForm");
+		if(getBeforeValue !== -1) this.#noteNameList[getBeforeValue].content.text = textarea.value; // notelist에서 해당 content값 수정
+		this.toggleList(`noteName${currentid}`, "a.notelink");
+		this.noteName = currentid; // 클릭한 거 가르키기
+		
+		const getAfterValue = this.#noteNameList.findIndex((element) => element.title === currentid);
+		super.loadTextareaValue(this.#noteNameList[getAfterValue].content.text); // textarea에 값 셋팅해야함
+	}
+
+	// 리스트 클릭 이벤트(값 찾아와서 textarea에 적용)
+	setClickListEvent(list) {
+		const handleList = async (e) => {
+			this.clickList(e.target.dataset.currentid);
 		}
 		list.addEventListener("click", handleList);
 	}
@@ -259,22 +227,13 @@ class Notepad extends NotepadForm{
 
 	// noteName값으로 header쪽의 리스트 생성
 	addItemAtList(classOfList, value) {
-		// header setting
+		if(!value) return;
 		const item = this.setTitle(value);
-		this.setClickList(item); // 클릭이벤트
+		this.setClickListEvent(item); // 클릭이벤트
 
-		const navContainer = document.querySelector(classOfList);
+		const navContainer = document.getElementById(classOfList);
 		navContainer.appendChild(item);
-	}
-
-	initItemAtList(classOfList) {
-		const navContainer = document.querySelector(classOfList);
-		this.#noteNameList.forEach((item) => {
-			const list = this.setTitle(item.title);
-			this.setClickList(list); // 클릭이벤트
-			navContainer.appendChild(list);
-			if(this.noteName === item.title) this.toggleList(`noteName${item.title}`, "a.notelink");
-		})
+		this.toggleList(`noteName${value}`, "a.notelink");
 	}
 
 	// 파일 만들때 난수 생성해서 이름짓고 리스트추가(저장 안된상태)
@@ -289,10 +248,31 @@ class Notepad extends NotepadForm{
 					id: this.#noteNameList[this.#noteNameList.length]
 				}
 			});
-			this.addItemAtList(".navContainer", random);
+			this.addItemAtList("navContainer", random);
+			this.clickList(random);
+			this.loadTextareaValue();
 		}
 		openBtn.addEventListener("click", handleOpenFile);
 	}
+
+	// setButtonWithData(type, classOfBtn, data) {
+	// 	const buttonController = new NoteButton(type);
+	// 	const btn = noteButton.setButton(classOfBtn, data);
+	// 	switch(type) {
+	// 		case "save":
+	// 			const handleSave = (e) => {
+	// 				buttonController.clickSave(btn);
+
+	// 			}
+	// 			btn.addEventListener("click", handleSave);
+	// 			break;
+	// 		case "delete":
+	// 			break;
+	// 		case "saveAs":
+	// 	}
+
+	// 	return btn;
+	// }
 
 	// 저장, 다른이름저장, 닫기 버튼 관리
 	setButtonGroup() {
@@ -357,7 +337,7 @@ class MyWindow {
 
 	async initMyWindow() {
 		const myNotepad = await new Notepad();
-		myNotepad.initItemAtList(".navContainer");
+		myNotepad.addItemAtList("navContainer", myNotepad.noteName);
 		const mainSection = document.querySelector("section.notepad");
 		myNotepad.setNotepadForm(mainSection);
 		myNotepad.clickNewFile();

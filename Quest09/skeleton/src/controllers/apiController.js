@@ -44,7 +44,7 @@ export const postSaveNote = (req, res) => {
         localStorage.setItem(title, JSON.stringify(value));
         localStorage.setItem("session", title);
         req.session.endTitle =  title;
-        console.log(req.session);
+
         return res.sendStatus(201);
     } catch(e) {
         return res.sendStatus(400);
@@ -94,7 +94,6 @@ export const getLoadAllData = (req, res) => {
     try {
         const data = getStorageItems(false);
         data.push({endTitle: localStorage.getItem("session") ?? ""});
-        console.log(data);
         return res.status(201).json(data);
     } catch(e) {
         return res.sendStatus(400);

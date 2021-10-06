@@ -23,7 +23,7 @@ const MysqlOptions = {
 const appSetting = (app) => {
     app.use("/static", express.static("public"));
     app.use(morgan("dev"));
-    app.use(express.urlencoded({extended: true}));
+    app.use(express.urlencoded({extended: false}));
     app.use(express.json());
     app.use("/node_modules", express.static("node_modules"));
 };

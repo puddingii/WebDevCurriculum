@@ -4,8 +4,8 @@
   "description": "메모장 시스템을 서버와 연동하는 어플리케이션",
   "main": "server.js",
   "scripts": {
-    "devHome": "nodemon -L --exec babel-node src/server.js",
-    "devApi": "nodemon -L --exec babel-node src/apiServer.js"
+    "dev:home": "nodemon -L --exec babel-node src/server.js",
+    "dev:api": "nodemon -L --exec babel-node src/apiServer.js"
   },
   "author": "",
   "license": "ISC",
@@ -16,7 +16,9 @@
     "express-mysql-session": "^2.1.7",
     "express-session": "^1.17.2",
     "morgan": "^1.10.0",
-    "node-localstorage": "^2.2.1"
+    "node-fetch": "^3.0.0",
+    "node-localstorage": "^2.2.1",
+    "pug": "^3.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.15.5",

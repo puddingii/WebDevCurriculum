@@ -34,8 +34,7 @@ const appSetting = (app) => {
 appSetting(clientApp);
 appSetting(apiApp);
 clientApp.set("views", `${process.cwd()}/src/views`);
-clientApp.set("view engine", "ejs");
-clientApp.engine("html", require("ejs").renderFile);
+clientApp.set("view engine", "pug");
 
 clientApp.use(session({
     secret: "lksajdf3a3wporn3pinoflasd",
