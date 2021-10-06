@@ -15,64 +15,8 @@ class NoteButton {
 		submitBtn.className = className;
 		submitBtn.id = this.#type;
 		submitBtn.innerText = this.#type;
-		switch(this.#type) {
-			case "save":
-				this.clickSave(submitBtn);
-				break;
-			case "delete":
-				this.clickDelete(submitBtn);
-				break;
-			case "saveAs":
-				this.clickSaveAs(submitBtn);
-		}
+
 		return submitBtn;
-	}
-
-	clickSave(btn) {
-		const handleSave = async (e) => {
-			const textarea = document.getElementById("textareaForm");
-			const { 
-				dataset: {currentid: title},
-				value
-			} = textarea;
-			const response = await this.myLocalStorage.saveContent(title, value);
-			if(response.status === 201) {
-				location.reload();
-			} else {
-				alert("통신오류.");
-			}
-		}
-		btn.addEventListener("click", handleSave);
-	}
-
-	clickDelete(btn) {
-		const handleDelete = async (e) => {
-			const textarea = document.getElementById("textareaForm");
-			const { 
-				dataset: {currentid: title},
-			} = textarea;
-			const response = await this.myLocalStorage.deleteContent(title)
-			if(response.status === 200) {
-				location.reload();
-			} else {
-				alert("통신오류.");
-			}
-		}
-		btn.addEventListener("click", handleDelete);
-	}
-
-	clickSaveAs(btn) { 
-		const handleSaveAs = async (e) => {
-			const textarea = document.getElementById("textareaForm");
-			const title = document.getElementById("saveAsInput").value;
-			const response = await this.myLocalStorage.saveAsContent(title, textarea.value);
-			if(response.status === 201) {
-				location.reload();
-			} else {
-				alert("같은 이름의 파일이 있거나 통신오류입니다.");
-			}
-		}
-		btn.addEventListener("click", handleSaveAs);
 	}
 }
 
@@ -141,20 +85,34 @@ class Notepad extends NotepadForm{
 		return this.#noteNameList;
 	}
 
+	deleteDropdownItem(id, classOfMenu) {
+		const dropdownMenu = document.querySelector(classOfMenu); // .dropdown-menu
+		const dropdownItems = dropdownMenu.querySelectorAll("li");
+		dropdownItems.forEach((item) => { 
+			if(item.dataset.currentid === id) item.remove();
+		});
+	}
+
     // Dropdown에 리스트들 표시
 	addDropdownItem(value, classOfMenu) {
 		const dropdownMenu = document.querySelector(classOfMenu); // .dropdown-menu
+		const dropdownItems = dropdownMenu.querySelectorAll("a");
+		dropdownItems.forEach((item) => { 
+			if(item.dataset.currentid === value) return;
+		});
 		const dropdownItem = document.createElement("li");
+		dropdownItem.dataset.currentid = value;
 		const itemLink = document.createElement("a");
-		itemLink.className = `Dropdown${value} dropdown-item`;
+		itemLink.className = "dropdown-item";
+		itemLink.dataset.currentid = value;
 		itemLink.href="#";
 		itemLink.innerText= value;
 		dropdownItem.appendChild(itemLink);
-		this.clickDropdownItem(dropdownItem);
+		this.setDropdownEvent(dropdownItem);
 		dropdownMenu.appendChild(dropdownItem);
 	}
 
-	clickDropdownItem(item) {
+	setDropdownEvent(item) {
 		const handleLoadList = async (e) => {
 			const title = e.target.innerText;
 			const items = document.querySelectorAll(".notelink");
@@ -175,8 +133,8 @@ class Notepad extends NotepadForm{
 
 	clickList(currentid) {
 		const getBeforeValue = this.#noteNameList.findIndex((element) => element.title === this.noteName);
-		const noteDiv = document.getElementById("noteDiv");
-		noteDiv.classList.remove("disNone");
+		const noteFormDiv = document.getElementById("noteFormDiv");
+		noteFormDiv.classList.remove("disNone");
 
 		const textarea = document.getElementById("textareaForm");
 		if(getBeforeValue !== -1) this.#noteNameList[getBeforeValue].content.text = textarea.value; // notelist에서 해당 content값 수정
@@ -196,7 +154,7 @@ class Notepad extends NotepadForm{
 	}
 
     // haeder에 있는 리스트에 notepad이름들 추가
-	setTitle(name) {
+	setNotepadHead(name) {
 		const noteList = document.createElement("li");
 		noteList.className = "nav-item notetab";
 		noteList.id = `noteList${name}`;
@@ -228,7 +186,7 @@ class Notepad extends NotepadForm{
 	// noteName값으로 header쪽의 리스트 생성
 	addItemAtList(classOfList, value) {
 		if(!value) return;
-		const item = this.setTitle(value);
+		const item = this.setNotepadHead(value);
 		this.setClickListEvent(item); // 클릭이벤트
 
 		const navContainer = document.getElementById(classOfList);
@@ -239,7 +197,7 @@ class Notepad extends NotepadForm{
 	// 파일 만들때 난수 생성해서 이름짓고 리스트추가(저장 안된상태)
 	clickNewFile() {
 		const openBtn = document.getElementById("openFile");
-		const handleOpenFile = (e) => {
+		const handleNewFile = (e) => {
 			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
 			this.#noteNameList.push({
 				title: random,
@@ -252,48 +210,76 @@ class Notepad extends NotepadForm{
 			this.clickList(random);
 			this.loadTextareaValue();
 		}
-		openBtn.addEventListener("click", handleOpenFile);
+		openBtn.addEventListener("click", handleNewFile);
 	}
 
-	// setButtonWithData(type, classOfBtn, data) {
-	// 	const buttonController = new NoteButton(type);
-	// 	const btn = noteButton.setButton(classOfBtn, data);
-	// 	switch(type) {
-	// 		case "save":
-	// 			const handleSave = (e) => {
-	// 				buttonController.clickSave(btn);
+	closeNotepad() {
+		const textarea = document.getElementById("noteFormDiv");
+		textarea.classList.add("disNone");
 
-	// 			}
-	// 			btn.addEventListener("click", handleSave);
-	// 			break;
-	// 		case "delete":
-	// 			break;
-	// 		case "saveAs":
-	// 	}
+		const note = document.getElementById(`noteList${this.noteName}`);
+		this.noteName = "";
+		note.remove();
+	}
 
-	// 	return btn;
-	// }
+	setButtonWithData(type, classOfBtn) {
+		const buttonController = new NoteButton(type);
+		const btn = buttonController.setButton(classOfBtn);
+		const textareaForm = document.getElementById("textareaForm");
+		const noteData = {  //id 부분 다시 나중에 확인할 것
+			title: textareaForm.dataset.currentid,
+			content: {
+				text: textareaForm.value,
+				id: this.#noteNameList[this.#noteNameList.length]
+			}
+		};
+		let actionOfBtn;
+		switch(type) {
+			case "save":
+				actionOfBtn = async (e) => {
+					await this.myLocalStorage.saveContent(textareaForm.dataset.currentid, textareaForm.value);
+					this.addDropdownItem(textareaForm.value, ".dropdown-menu"); // dropdown목록 확인후 추가
+					const indexOfItem = this.#noteNameList.findIndex((element) => element.title === textareaForm.dataset.currentid);
+					indexOfItem !== -1 ? this.#noteNameList[indexOfItem] = noteData : this.#noteNameList.push(noteData);
+				}
+				break;
+			case "delete":
+				actionOfBtn = async (e) => {
+					await this.myLocalStorage.deleteContent(textareaForm.dataset.currentid);
+					this.deleteDropdownItem(textareaForm.dataset.currentid, ".dropdown-menu");
+					this.closeNotepad();
+					this.#noteNameList = this.#noteNameList.filter((element) => element.title !== textareaForm.dataset.currentid);
+					console.log(this.#noteNameList);
+				}
+				break;
+			case "saveAs":
+				actionOfBtn = async (e) => {
+					const saveAsInput = document.getElementById("saveAsInput").value;
+					await this.myLocalStorage.saveAsContent(saveAsInput, textareaForm.value);
+					this.addDropdownItem(saveAsInput, ".dropdown-menu");
+					noteData.title = saveAsInput;
+					this.#noteNameList.push(noteData);
+				}
+				break;
+			default:
+				actionOfBtn = (e) => {
+					this.closeNotepad();
+				}
+		}
+		btn.addEventListener("click", actionOfBtn);
+		return btn;
+	}
 
 	// 저장, 다른이름저장, 닫기 버튼 관리
 	setButtonGroup() {
 		const btnGroup = document.createElement("div");
 		btnGroup.id = "btnGroup";
 
-		const textareaId = document.getElementById("textareaForm").dataset.currentid;
-		const data = { title: this.noteName, textId: textareaId}
-		const saveBtn = new NoteButton("save").setButton("btn btn-outline-primary", data);
-		const saveAsBtn = new NoteButton("saveAs").setButton("btn btn-outline-primary", data);
-		const deleteBtn = new NoteButton("delete").setButton("btn btn-outline-danger", data);
-		const closeBtn = new NoteButton("close").setButton("btn btn-outline-danger", data);
-		const handleClose = (e) => {
-			const textarea = document.getElementById("noteDiv");
-			textarea.classList.add("disNone");
-
-			const item = document.getElementById(`noteList${this.noteName}`);
-			this.noteName = "";
-			item.remove();
-		}
-		closeBtn.addEventListener("click", handleClose);
+		const saveBtn = this.setButtonWithData("save", "btn btn-outline-primary");
+		const saveAsBtn = this.setButtonWithData("saveAs", "btn btn-outline-primary");
+		const deleteBtn = this.setButtonWithData("delete", "btn btn-outline-danger");
+		const closeBtn = this.setButtonWithData("close", "btn btn-outline-danger");
+		
 		const saveAsInput = document.createElement("input");
 		saveAsInput.type= "text";
 		saveAsInput.className = "form-control";
@@ -314,7 +300,7 @@ class Notepad extends NotepadForm{
         const noteForm = document.createElement("div");
         noteForm.className = "form-floating";
 		if(!this.noteName) noteForm.classList.add("disNone");
-		noteForm.id = "noteDiv";
+		noteForm.id = "noteFormDiv";
 
 		const noteNameIndex = this.#noteNameList.findIndex((element) => element.title === this.noteName);
         const textArea = noteNameIndex !== -1 ? super.setTextarea(this.#noteNameList[noteNameIndex].content.text) : super.setTextarea();
@@ -338,6 +324,7 @@ class MyWindow {
 	async initMyWindow() {
 		const myNotepad = await new Notepad();
 		myNotepad.addItemAtList("navContainer", myNotepad.noteName);
+
 		const mainSection = document.querySelector("section.notepad");
 		myNotepad.setNotepadForm(mainSection);
 		myNotepad.clickNewFile();
