@@ -1,6 +1,6 @@
 class MyLocalStorage {
-    constructor() {}
-    async loadContent() {
+	constructor() {}
+	async loadContent() {
 		const response = await fetch("http://localhost:8000/api/loadAllData");
 		const storage = await response.json();
 		return storage;
