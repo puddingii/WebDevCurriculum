@@ -2,7 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import session from "express-session";
 import MySQLStore from "express-mysql-session";
-import homeRouter from "./routers/homeRouter";
+import homeRouter from "./routers/homeRouter.js";
 
 MySQLStore(session);
 const CLIENTPORT = 3000;

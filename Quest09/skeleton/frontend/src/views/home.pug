@@ -26,9 +26,4 @@ head
         br
         section.notepad
 script(src='/static/js/localApi.js')
-script(src='/static/js/notepad_test.js')
-script.
-  (async() =>{
-    const testWindow = new MyWindow();
-    await testWindow.initMyWindow();
-  })();
+script(type="module" src='/static/js/notepadLoader.js')

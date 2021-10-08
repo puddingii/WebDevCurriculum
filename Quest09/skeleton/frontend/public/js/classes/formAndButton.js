@@ -1,89 +1,27 @@
-class NoteButton {
-    #type;
-	constructor(type) {
-        this.#type = type;
-    }
-    get type() {
-        return this.#type;
-    }
+import { NoteButton } from "./noteButton.js";
+import { NotepadForm } from "./notepadForm.js";
 
-    // 버튼을 생성후 반환.
-	setButton(className) {
-		const submitBtn = document.createElement("button");
-		submitBtn.type = "button";
-		submitBtn.className = className;
-		submitBtn.id = this.#type;
-		submitBtn.innerText = this.#type;
-
-		return submitBtn;
-	}
-}
-
-class NotepadForm {
-    #noteName;
-	myLocalStorage = new MyLocalStorage();
-	constructor(noteName) {
-        this.#noteName = noteName;
-    }
-    get noteName() {
-        return this.#noteName;
-    }
-    set noteName(noteName) {
-        this.#noteName = noteName;
-    }
-
-    // textarea생성과 textarea처리를 위한 버튼 생성
-    monitorTextarea(textarea, labelId, text) {
-        const handleTextarea = (e) => {
-            document.getElementById(labelId).innerText = text;
-        }
-        textarea.addEventListener("input", handleTextarea);
-    }
-
-    // 텍스트 적을곳 생성
-	initTextarea(value = "") {
-		const noteArea = document.createElement("textarea");
-		noteArea.className = "form-control";
-        noteArea.id = "textareaForm";
-        noteArea.value = value;
-		this.monitorTextarea(noteArea, "textareaLabel", "저장 안됨.");
-
-		return noteArea;
-	}
-
-	// textarea value 설정
-	loadTextareaValue(textId, inputId, value = "") {
-		const noteArea = document.getElementById(textId);
-		noteArea.value = value;
-
-		const saveAsInput = document.getElementById(inputId);
-		saveAsInput.value = this.#noteName;
-	}
-}
-
-class Notepad extends NotepadForm{
+export class Notepad extends NotepadForm{
 	#noteNameList = [];
 	textareaForm = document.getElementById("textareaForm");
 	noteFormDiv = document.getElementById("noteFormDiv");
 	
 	// 데이터 가져온 뒤 private변수에 저장
-    constructor() {
-		return (async() => {
-			const allData = await new MyLocalStorage().loadContent();
-			const endTitle = allData.pop().endTitle;
-			super(allData.length !== 0 ? endTitle : "");
-			this.#noteNameList = allData;
-			this.#noteNameList.sort((a, b) => a.content.id - b.content.id);
-			
-			return this;
-		})();
-	}
+    constructor() { super(""); }
 
 	set noteNameList(noteNameList) {
 		this.#noteNameList = noteNameList;
 	}
 	get noteNameList() {
 		return this.#noteNameList;
+	}
+
+	async initNotepad() {
+		const allData = await new MyLocalStorage().loadContent();
+		const endTitle = allData.pop().endTitle;
+		this.noteName = allData.length !== 0 ? endTitle : "";
+		this.#noteNameList = allData;
+		this.#noteNameList.sort((a, b) => a.content.id - b.content.id);
 	}
 
 	// Dropdown에 있는 아이템 삭제
@@ -243,7 +181,8 @@ class Notepad extends NotepadForm{
 				}
 			};
 		}
-		
+		const setTextlabelValue = (value) => { textLabel.innerText = value; }
+
 		let actionOfBtn;
 		switch(type) {
 			case "save":
@@ -251,26 +190,26 @@ class Notepad extends NotepadForm{
 					const noteData = loadTextareaValue();
 					const response = await this.myLocalStorage.saveContent(this.noteName, textareaForm.value);
 					if(response.status !== 201)  {
-						textLabel.innerText = `처리오류 - Response status code : ${response.status}`;
+						setTextlabelValue(`처리오류 - Response status code : ${response.status}`);
 						return;
 					}
 					this.addDropdownItem(this.noteName, ".dropdown-menu"); // dropdown목록 확인후 추가
 					const indexOfItem = this.#noteNameList.findIndex((element) => element.title === this.noteName);
 					indexOfItem !== -1 ? this.#noteNameList[indexOfItem] = noteData : this.#noteNameList.push(noteData);
-					textLabel.innerText = "저장됨.";
+					setTextlabelValue("저장됨.");
 				}
 				break;
 			case "delete":
 				actionOfBtn = async (e) => {
 					const response = await this.myLocalStorage.deleteContent(this.noteName);
 					if(response.status !== 201)  {
-						textLabel.innerText = `처리오류 - Response status code : ${response.status}`;
+						setTextlabelValue(`처리오류 - Response status code : ${response.status}`);
 						return;
 					}
 					this.deleteDropdownItem(this.noteName, ".dropdown-menu");
 					this.closeNotepad();
 					this.#noteNameList = this.#noteNameList.filter((element) => element.title !== this.noteName);
-					textLabel.innerText = "저장됨.";
+					setTextlabelValue("저장됨.");
 				}
 				break;
 			case "saveAs":
@@ -279,14 +218,14 @@ class Notepad extends NotepadForm{
 					const saveAsInput = document.getElementById("saveAsInput").value;
 					const response = await this.myLocalStorage.saveAsContent(saveAsInput, textareaForm.value);
 					if(response.status !== 201)  {
-						textLabel.innerText = `처리오류 - Response status code : ${response.status}`;
+						setTextlabelValue(`처리오류 - Response status code : ${response.status}`);
 						return;
 					}
 					this.addDropdownItem(saveAsInput, ".dropdown-menu");
 					noteData.title = saveAsInput;
 					this.#noteNameList.push(noteData);
 					this.addItemAtList("navContainer", saveAsInput);
-					textLabel.innerText = "저장됨.";
+					setTextlabelValue("저장됨.");
 				}
 				break;
 			default:
@@ -344,20 +283,4 @@ class Notepad extends NotepadForm{
         noteForm.appendChild(btnGroup);
 		mainSection.appendChild(noteForm);
     }
-}
-
-class MyWindow {
-	constructor() {}
-
-	async initMyWindow() {
-		const myNotepad = await new Notepad();
-		myNotepad.addItemAtList("navContainer", myNotepad.noteName);
-
-		const mainSection = document.querySelector("section.notepad");
-		myNotepad.setNotepadForm(mainSection);
-		myNotepad.clickNewFile();
-		myNotepad.noteNameList.forEach((note) => {
-			myNotepad.addDropdownItem(note.title ,".dropdown-menu");
-		})
-	}
 }

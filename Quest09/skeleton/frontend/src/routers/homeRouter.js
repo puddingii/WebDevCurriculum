@@ -1,4 +1,5 @@
 import express from "express";
+import { loginStatus, logoutStatus } from "./middleware.js";
 
 const example = [
     {
@@ -17,17 +18,14 @@ const example = [
 
 const homeRouter = express.Router();
 
-homeRouter.route("/").get(async (req, res) => {
-    if(!req.session.userId) {
-        return res.redirect("/login");
-    }
+homeRouter.route("/").get(loginStatus ,async (req, res) => {
     return res.render("home", { userId: req.session.userId});
 });
 
-homeRouter.get("/login", (req, res) => {
-    return req.session.userId ? res.redirect("/") : res.render("login", {errorMsg: ""});
+homeRouter.get("/login", logoutStatus, (req, res) => {
+    return res.redirect("/login");
 });
-homeRouter.post("/login", (req, res) => {
+homeRouter.post("/login", logoutStatus, (req, res) => {
     const { loginId, loginPassword } = req.body;
     if(example.find((element) => element.loginId === loginId && element.loginPassword === loginPassword)) { 
         req.session.userId = loginId;
@@ -36,7 +34,7 @@ homeRouter.post("/login", (req, res) => {
     return res.render("login", {errorMsg: "Incorrect password"});
 });
 
-homeRouter.route("/logout").get((req, res) => {
+homeRouter.get("/logout", loginStatus, (req, res) => {
     req.session.userId = false;
     return res.redirect("/login");
 });
