@@ -27,7 +27,7 @@ homeRouter.route("/").get(async (req, res) => {
 homeRouter.get("/login", (req, res) => {
     return req.session.userId ? res.redirect("/") : res.render("login", {errorMsg: ""});
 });
-homeRouter.post((req, res) => {
+homeRouter.post("/login", (req, res) => {
     const { loginId, loginPassword } = req.body;
     if(example.find((element) => element.loginId === loginId && element.loginPassword === loginPassword)) { 
         req.session.userId = loginId;

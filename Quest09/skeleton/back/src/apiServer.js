@@ -1,7 +1,6 @@
 import express from "express";
 import morgan from "morgan";
 import cors from "cors";
-import session from "express-session";
 import apiRouter from "./routers/apiRouter";
 
 const APIPORT = 8000;
@@ -12,7 +11,6 @@ const corsOptions = {
 };
 
 const appSetting = (app) => {
-    app.use("/static", express.static("public"));
     app.use(morgan("dev"));
     app.use(express.urlencoded({extended: false}));
     app.use(express.json());
@@ -20,11 +18,6 @@ const appSetting = (app) => {
 };
 
 appSetting(apiApp);
-apiApp.use(session({
-    secret: "lksajdf3a3wporn3pinoflasd",
-    resave: false,
-    saveUninitialized: false,
-}));
 
 apiApp.use("/api", cors(corsOptions), apiRouter);
 
