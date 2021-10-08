@@ -1,6 +1,4 @@
-import NoteList from "./noteList";
-
-export default class NoteHeader extends NoteList {
+export default class NoteHeader {
     constructor() {
         super();
     }

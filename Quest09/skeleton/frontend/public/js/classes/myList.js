@@ -1,4 +1,4 @@
-export default class NoteList {
+export default class MyList {
     #itemName;
     constructor(itemName = "") {
         this.#itemName = itemName;
