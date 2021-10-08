@@ -1,18 +1,17 @@
-export class NotepadForm {
-    #noteName;
-	myLocalStorage = new MyLocalStorage();
-	constructor(noteName) {
-        this.#noteName = noteName;
+export default class NoteTextarea {
+    #noteId;
+	constructor(noteId) {
+        this.#noteId = noteId;
     }
-    get noteName() {
-        return this.#noteName;
+    get noteId() {
+        return this.#noteId;
     }
-    set noteName(noteName) {
-        this.#noteName = noteName;
+    set noteId(noteId) {
+        this.#noteId = noteId;
     }
 
     // textarea생성과 textarea처리를 위한 버튼 생성
-    monitorTextarea(textarea, labelId, text) {
+    monitorValue(textarea, labelId, text) {
         const handleTextarea = (e) => {
             document.getElementById(labelId).innerText = text;
         }
@@ -20,22 +19,22 @@ export class NotepadForm {
     }
 
     // 텍스트 적을곳 생성
-	initTextarea(value = "") {
+	initArea(value = "") {
 		const noteArea = document.createElement("textarea");
 		noteArea.className = "form-control";
         noteArea.id = "textareaForm";
         noteArea.value = value;
-		this.monitorTextarea(noteArea, "textareaLabel", "저장 안됨.");
+		this.monitorValue(noteArea, "textareaLabel", "저장 안됨.");
 
 		return noteArea;
 	}
 
 	// textarea value 설정
-	loadTextareaValue(textId, inputId, value = "") {
+	loadValue(textId, inputId, value = "") {
 		const noteArea = document.getElementById(textId);
 		noteArea.value = value;
 
 		const saveAsInput = document.getElementById(inputId);
-		saveAsInput.value = this.#noteName;
+		saveAsInput.value = this.#noteId;
 	}
 }

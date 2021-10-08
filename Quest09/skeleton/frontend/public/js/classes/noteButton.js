@@ -1,4 +1,4 @@
-export class NoteButton {
+export default class NoteButton {
     #type;
 	constructor(type) {
         this.#type = type;

@@ -5,7 +5,7 @@
   "description": "메모장 시스템을 서버와 연동하는 어플리케이션",
   "main": "server.js",
   "scripts": {
-    "dev:home": "nodemon -L --exec babel-node src/server.js"
+    "dev:home": "nodemon -L --exec babel-node server/app.js"
   },
   "author": "",
   "license": "ISC",

@@ -1,4 +1,4 @@
-import { Notepad } from "./formAndButton.js";
+import  Notepad from "./formAndButton.js";
 
 export class MyWindow {
 	constructor() {}
@@ -6,7 +6,7 @@ export class MyWindow {
 	async initMyWindow() {
 		const myNotepad = new Notepad();
 		await myNotepad.initNotepad();
-		myNotepad.addItemAtList("navContainer", myNotepad.noteName);
+		myNotepad.addItemAtList("navContainer", myNotepad.noteId);
 
 		const mainSection = document.querySelector("section.notepad");
 		myNotepad.setNotepadForm(mainSection);
