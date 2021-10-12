@@ -23,7 +23,7 @@ homeRouter.route("/").get(loginStatus ,async (req, res) => {
 });
 
 homeRouter.get("/login", logoutStatus, (req, res) => {
-    return res.redirect("/login");
+    return res.render("login");
 });
 homeRouter.post("/login", logoutStatus, (req, res) => {
     const { loginId, loginPassword } = req.body;

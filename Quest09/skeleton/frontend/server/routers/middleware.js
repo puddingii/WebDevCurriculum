@@ -2,7 +2,7 @@ export const loginStatus = (req, res, next) => {
     if(req.session.userId) {
         next();
     } else {
-        return res.render("login", {errorMsg: "Please login first"});
+        return res.redirect("/login");
     }
 };
 

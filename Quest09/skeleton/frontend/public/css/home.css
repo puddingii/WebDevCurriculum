@@ -32,7 +32,9 @@ input#difBtn {
 .card-text {
 	font-weight: bold;
 }
-
+.leftCard {
+	height: 150px;
+}
 @keyframes goAway {
 	from {
 		transform: none;

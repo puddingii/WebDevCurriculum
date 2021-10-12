@@ -1,7 +1,7 @@
 doctype html
 head
   meta(charset='UTF-8')
-  link(rel='stylesheet' href='/static/css/style.css')
+  link(rel='stylesheet' href='/static/css/home.css')
   title Notepad
   // CSS only
   link(href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css' rel='stylesheet' integrity='sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU' crossorigin='anonymous')
@@ -10,7 +10,7 @@ head
 // TODO: 이 곳을 채워 클라이언트를 만들어 보세요
 .container
   .row.align-items-md-stretch 
-    .col-md-3.card
+    .col-md-3.card.leftCard
       p Current id :
       p.card-text=userId
       button.btn.btn-danger(type="button" onclick="location.href='/logout'") Log out
@@ -22,7 +22,7 @@ head
               button#openFile.btn.btn-primary(type='button') 새 파일
               button#ddButton.btn.btn-primary.dropdown-toggle(type='button' data-bs-toggle='dropdown' aria-expanded='false')
                 | 불러오기
-              ul.dropdown-menu(aria-labelledby='ddButton')
+              ul.dropdown-menu#dropdownMenu(aria-labelledby='ddButton')
         br
         section.notepad
 script(src='/static/js/classes/manageStorage.js')

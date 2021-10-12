@@ -1,14 +1,7 @@
 export default class MyList {
-    #itemName;
-    constructor(itemName = "") {
-        this.#itemName = itemName;
-    }
-
-    get itemName() {
-        return this.#itemName;
-    }
-    set itemName(itemName) {
-        this.#itemName = itemName;
+    constructor(idOfList) {
+        this.idOfList = idOfList;
+        this.myList = document.getElementById(idOfList);
     }
 
     initItem(itemInfo, linkInfo) {
@@ -16,18 +9,20 @@ export default class MyList {
         const item = document.createElement("li");
         item.className = itemInfo.className;
         item.id = itemInfo.id;
-        item.dataset[itemInfo.dataset.key] = itemInfo.dataset.value;
+        if(itemInfo.dataset.key) item.dataset[itemInfo.dataset.key] = itemInfo.dataset.value;
 
         const itemLink = document.createElement("a");
         itemLink.className = linkInfo.className;
         itemLink.id = linkInfo.id;
         itemLink.innerText = linkInfo.text;
         itemLink.href = linkInfo.href;
+        if(linkInfo.dataset.key) itemLink.dataset[linkInfo.dataset.key] = linkInfo.dataset.value;
+        item.appendChild(itemLink);
 
         return item;
     }
 
-    // list 토글 기능만 있음.
+    // list 토글 기능만 있음. *
 	toggleItem(eventTarget, classOfItems) {
 		const noteLinks = document.querySelectorAll(classOfItems); 
 		noteLinks.forEach((notelink) => {

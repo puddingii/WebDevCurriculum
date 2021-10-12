@@ -6,13 +6,13 @@ export class MyWindow {
 	async initMyWindow() {
 		const myNotepad = new Notepad();
 		await myNotepad.initNotepad();
-		myNotepad.addItemAtList("navContainer", myNotepad.noteId);
+		myNotepad.addItemAtList(myNotepad.noteTextarea.noteId);
 
 		const mainSection = document.querySelector("section.notepad");
 		myNotepad.setNotepadForm(mainSection);
 		myNotepad.clickNewFile();
 		myNotepad.noteNameList.forEach((note) => {
-			myNotepad.addDropdownItem(note.title ,".dropdown-menu");
+			myNotepad.addDropdownItem(note.title);
 		});
 	}
 }
