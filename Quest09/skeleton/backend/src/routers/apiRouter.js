@@ -4,7 +4,7 @@ const localStorage = new StorageUtil("./scratch");
 const apiRouter = express.Router();
 
 // 저장 눌렀을 때 서버에 데이터 저장
-apiRouter.route("/saveNote").post((req, res) => {
+apiRouter.route("/save").post((req, res) => {
     const { 
         body: { text, title } 
     } = req;
@@ -27,7 +27,7 @@ apiRouter.route("/saveNote").post((req, res) => {
     }
 });
 
-apiRouter.route("/deleteNote").delete((req, res) => {
+apiRouter.route("/delete").delete((req, res) => {
     const { 
         body: { title } 
     } = req;
@@ -40,7 +40,7 @@ apiRouter.route("/deleteNote").delete((req, res) => {
     }
 });
 
-apiRouter.route("/saveDifNote").post((req, res) => {
+apiRouter.route("/saveAs").post((req, res) => {
     const { 
         body: { text, title } 
     } = req;

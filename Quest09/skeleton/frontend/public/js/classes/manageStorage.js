@@ -7,7 +7,7 @@ class MyLocalStorage {
 	}
 
 	async deleteContent(title) {
-		const response = await fetch("http://localhost:8000/api/deleteNote", {
+		const response = await fetch("http://localhost:8000/api/delete", {
 			method: "delete",
 			headers: {
 				"Content-type": "application/json"
@@ -18,7 +18,7 @@ class MyLocalStorage {
 	}
 
 	async saveContent(title, text) {
-		const response = await fetch("http://localhost:8000/api/saveNote", {
+		const response = await fetch("http://localhost:8000/api/save", {
 			method: "post",
 			headers: {
 				"Content-type": "application/json"
@@ -29,7 +29,7 @@ class MyLocalStorage {
 	}
 
 	async saveAsContent(title, text) {
-		const response = await fetch("http://localhost:8000/api/saveDifNote", {
+		const response = await fetch("http://localhost:8000/api/saveAs", {
 			method: "post",
 			headers: {
 				"Content-type": "application/json"
