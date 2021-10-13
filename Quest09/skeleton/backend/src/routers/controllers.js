@@ -1,4 +1,5 @@
 import express from "express";
+import Users from "../models/user"
 import { StorageUtil } from "./util/storageUtil";
 const localStorage = new StorageUtil("./scratch");
 const apiRouter = express.Router();
@@ -62,12 +63,17 @@ apiRouter.route("/saveAs").post((req, res) => {
     }
 });
 
-apiRouter.route("/loadAllData").get((req, res) => {
+apiRouter.route("/loadAllData").get( async(req, res) => {
     try {
+        // const test = await Users.create({ email:"alsdkjf@nav.com", password:"adf", opentab:"adsf", lasttab:""});
+        const test = await Users.findAll();
+        console.log(JSON.stringify(test, null, 2));
+        // await test.save();
         const data = localStorage.getStorageItems(false);
         data.push({endTitle: localStorage.getItem("userData") ?? ""});
         return res.status(200).json(data);
     } catch(e) {
+        console.log(e);
         return res.sendStatus(400);
     }
 });
