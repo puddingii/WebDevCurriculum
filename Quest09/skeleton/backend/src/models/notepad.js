@@ -16,7 +16,8 @@ Notepad.init({
   id: {
     allowNull: false,
     primaryKey: true,
-    type: DataTypes.STRING
+    autoIncrement: true,
+    type: DataTypes.INTEGER
   },
   email: {
     allowNull: false,

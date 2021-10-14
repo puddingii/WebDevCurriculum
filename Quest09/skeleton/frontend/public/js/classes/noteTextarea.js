@@ -1,13 +1,21 @@
 export default class NoteTextarea {
     #noteId;
-	constructor(noteId) {
+    #noteName;
+	constructor(noteId, noteName) {
         this.#noteId = noteId;
+        this.#noteName = noteName;
     }
     get noteId() {
         return this.#noteId;
     }
     set noteId(noteId) {
-        this.#noteId = noteId;
+        this.#noteId = parseInt(noteId);
+    }
+    get noteName() {
+        return this.#noteName;
+    }
+    set noteName(noteName) {
+        this.#noteName = noteName;
     }
 
     // textarea생성과 textarea처리를 위한 버튼 생성
@@ -30,11 +38,11 @@ export default class NoteTextarea {
 	}
 
 	// textarea value 설정
-	loadValue(textId, inputId, value = "") {
+	loadValue(textId, inputId, inputValue, textareaValue = "") {
 		const noteArea = document.getElementById(textId);
-		noteArea.value = value;
+		noteArea.value = textareaValue;
 
 		const saveAsInput = document.getElementById(inputId);
-		saveAsInput.value = this.#noteId;
+		saveAsInput.value = inputValue;
 	}
 }

@@ -5,10 +5,10 @@ export default class NavBar extends MyList {
         super(idOfList);
     }
 
-    isItemInList(items, title) {
+    isItemInList(items, id) {
         let isTitleInList = false;
         items.forEach((element) => {
-            if(element.dataset.currentid === title) {
+            if(parseInt(element.dataset.currentid) === id) {
                 isTitleInList = true;
                 return;
             }

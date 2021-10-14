@@ -1,42 +1,40 @@
 import express from "express";
-import Users from "../models/user"
+import Users from "../models/user";
+import Notepads from "../models/notepad";
 import { StorageUtil } from "./util/storageUtil";
 const localStorage = new StorageUtil("./scratch");
 const apiRouter = express.Router();
 
 // 저장 눌렀을 때 서버에 데이터 저장
-apiRouter.route("/save").post((req, res) => {
+apiRouter.route("/save").post( async(req, res) => {
     const { 
-        body: { text, title } 
+        body: { id, text, email, title } 
     } = req;
 
-    try { // localstorage에 없을 경우도 생각해야됨.
-        const item = localStorage.getItem(title);
-        let value = { text };
+    try { 
+        const item = await Notepads.findOne({ where: { id }});
         if(item) {
-            value["id"] = JSON.parse(item).id;
-            
+            await Notepads.update({ content: text },{ where: { id } });
         } else {
-            value["id"] = localStorage.getStorageItems(true).length !== 0 ? localStorage.getMaxId(localStorage.getStorageItems(true)) + 1 : 0;
+            await Notepads.create({ id, email, title, content: text });
         }
-        localStorage.setItem(title, JSON.stringify(value));
-        localStorage.setItem("userData", title);
+
         return res.sendStatus(201);
-        
     } catch(e) {
+        console.log(e);
         return res.sendStatus(400);
     }
 });
 
 apiRouter.route("/delete").delete((req, res) => {
     const { 
-        body: { title } 
+        body: { id } 
     } = req;
     try {
-        localStorage.removeItem(title);
-        localStorage.setItem("userData", "");
+        await Notepads.destroy({ where: { id } });
         return res.sendStatus(201);
     } catch(e) {
+        console.log(e);
         return res.sendStatus(400);
     }
 });
@@ -65,12 +63,14 @@ apiRouter.route("/saveAs").post((req, res) => {
 
 apiRouter.route("/loadAllData").get( async(req, res) => {
     try {
-        // const test = await Users.create({ email:"alsdkjf@nav.com", password:"adf", opentab:"adsf", lasttab:""});
-        const test = await Users.findAll();
-        console.log(JSON.stringify(test, null, 2));
-        // await test.save();
-        const data = localStorage.getStorageItems(false);
-        data.push({endTitle: localStorage.getItem("userData") ?? ""});
+        const { 
+            query: { email }
+        } = req;
+        const userInfo = await Users.findOne({ where: { email }});
+        const notepadInfo = await Notepads.findAll({ where: { email }});
+        notepadInfo.push({ endTitle: userInfo.getLasttab(), openTab: userInfo.getOpentab() });
+        const data = JSON.parse(JSON.stringify(notepadInfo, null, 2));
+        
         return res.status(200).json(data);
     } catch(e) {
         console.log(e);
