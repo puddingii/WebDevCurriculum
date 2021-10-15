@@ -2,6 +2,7 @@ import express from "express";
 import morgan from "morgan";
 import cors from "cors";
 import apiRouter from "./routers/controllers";
+import userApi from "./routers/userController";
 
 const APIPORT = 8000;
 
@@ -20,6 +21,7 @@ const appSetting = (app) => {
 appSetting(apiApp);
 
 apiApp.use("/api", cors(corsOptions), apiRouter);
+apiApp.use("/api/users", cors(corsOptions), userApi);
 
 const handleApiListen = () => console.log(`Api Listening: http://localhost:${APIPORT}`);
 apiApp.listen(APIPORT,handleApiListen);

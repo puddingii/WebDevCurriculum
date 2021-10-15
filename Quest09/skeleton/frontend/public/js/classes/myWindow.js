@@ -8,16 +8,17 @@ export class MyWindow {
 	async initMyWindow() {
 		const myNotepad = new Notepad();
 		await myNotepad.initNotepad(this.currentUserId);
-		const lastTabId = parseInt(myNotepad.noteTextarea.noteId);
-		const lastTabName = myNotepad.getNoteById(lastTabId).title;
+		const lastTabId = myNotepad.noteTextarea.noteId;
 		
 		const mainSection = document.querySelector("section.notepad");
 		myNotepad.setNotepadForm(mainSection);
 		myNotepad.clickNewFile();
-		myNotepad.addItemAtList(lastTabName, lastTabId);
-		myNotepad.navbarList.toggleItem(`noteId${lastTabId}`, "a.notelink");
+		myNotepad.openTabs.forEach((tab) => {
+			myNotepad.addItemAtList(myNotepad.getNoteById(parseInt(tab)).title, tab);
+		})
 		myNotepad.noteNameList.forEach((note) => {
 			myNotepad.addDropdownItem(note.title, note.id);
 		});
+		myNotepad.navbarList.toggleItem(`noteId${lastTabId}`, "a.notelink");
 	}
 }

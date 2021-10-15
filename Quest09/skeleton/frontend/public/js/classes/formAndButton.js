@@ -24,7 +24,9 @@ export default class Notepad {
 	get noteNameList() {
 		return this.#noteNameList;
 	}
-
+	get openTabs() {
+		return this.#openTabs;
+	}
 	getLastItemId() {
 		return this.#noteNameList[this.#noteNameList.length-1].id;
 	}
@@ -35,7 +37,7 @@ export default class Notepad {
 	async initNotepad(currentUserId) {
 		const allData = await new MyLocalStorage(currentUserId).loadContent();
 		const { endTitle, openTab } = allData.pop();
-		this.#openTabs = openTab;
+		this.#openTabs = openTab.split(',');
 		this.#userEmail = currentUserId;
 		this.noteTextarea.noteId = allData.length ? endTitle : "";
 		this.#noteNameList = allData;

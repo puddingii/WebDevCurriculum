@@ -1,6 +1,6 @@
 import express from "express";
-import Users from "../models/user";
-import Notepads from "../models/notepad";
+import Users from "../../models/user";
+import Notepads from "../../models/notepad";
 const apiRouter = express.Router();
 
 // 저장 눌렀을 때 서버에 데이터 저장
@@ -25,6 +25,7 @@ apiRouter.route("/save").post( async(req, res) => {
     }
 });
 
+// 삭제버튼을 눌렀을 때
 apiRouter.route("/delete").delete( async(req, res) => {
     const { 
         body: { id } 
@@ -39,6 +40,7 @@ apiRouter.route("/delete").delete( async(req, res) => {
     }
 });
 
+// 다른이름으로 저장을 눌렀을 때
 apiRouter.route("/saveAs").post( async(req, res) => {
     const { 
         body: { id, email, text, title } 
@@ -51,13 +53,14 @@ apiRouter.route("/saveAs").post( async(req, res) => {
         }
         await Notepads.create({ id, email, title, content: text });
         await Users.update({ lasttab: id }, { where: { email } });
-        
+
         return res.sendStatus(201);
     } catch(e) {
         return res.sendStatus(400);
     }
 });
 
+// 모든 데이터 불러오기
 apiRouter.route("/loadAllData").get( async(req, res) => {
     try {
         const { 

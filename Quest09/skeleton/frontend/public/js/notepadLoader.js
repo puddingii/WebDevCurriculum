@@ -6,5 +6,7 @@ import { MyWindow }  from "./classes/myWindow.js";
     await testWindow.initMyWindow();
 })();
 $( function() {
-    $(".sortable").sortable();
+    $(".sortable").sortable({
+        items: "li.notetab"
+    });
 });
