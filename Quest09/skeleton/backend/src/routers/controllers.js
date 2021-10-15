@@ -1,24 +1,23 @@
 import express from "express";
 import Users from "../models/user";
 import Notepads from "../models/notepad";
-import { StorageUtil } from "./util/storageUtil";
-const localStorage = new StorageUtil("./scratch");
 const apiRouter = express.Router();
 
 // 저장 눌렀을 때 서버에 데이터 저장
 apiRouter.route("/save").post( async(req, res) => {
     const { 
-        body: { id, text, email, title } 
+        body: { id, email, title, text } 
     } = req;
 
     try { 
-        const item = await Notepads.findOne({ where: { id }});
-        if(item) {
+        const user = await Users.findOne({ where: { email } });
+        const note = await Notepads.findOne({ where: { id }});
+        if(note && user) {
             await Notepads.update({ content: text },{ where: { id } });
         } else {
             await Notepads.create({ id, email, title, content: text });
         }
-
+        await Users.update({ lasttab: id }, { where: { email } });
         return res.sendStatus(201);
     } catch(e) {
         console.log(e);
@@ -26,12 +25,13 @@ apiRouter.route("/save").post( async(req, res) => {
     }
 });
 
-apiRouter.route("/delete").delete((req, res) => {
+apiRouter.route("/delete").delete( async(req, res) => {
     const { 
         body: { id } 
     } = req;
     try {
         await Notepads.destroy({ where: { id } });
+        await Users.update({ lasttab: "" }, { where: { email } });
         return res.sendStatus(201);
     } catch(e) {
         console.log(e);
@@ -39,23 +39,20 @@ apiRouter.route("/delete").delete((req, res) => {
     }
 });
 
-apiRouter.route("/saveAs").post((req, res) => {
+apiRouter.route("/saveAs").post( async(req, res) => {
     const { 
-        body: { text, title } 
+        body: { id, email, text, title } 
     } = req;
 
     try {
-        if(localStorage.getItem(title)) {
-            return res.sendStatus(400);
-        } else {
-            const value = {
-                text,
-                id: localStorage.getStorageItems(true).length !== 0 ? localStorage.getMaxId(localStorage.getStorageItems(true)) + 1 : 0
-            };
-            localStorage.setItem(title, JSON.stringify(value));
-            localStorage.setItem("userData", title);
-            return res.sendStatus(201);
+        const item = await Notepads.findOne({ where: { id }});
+        if(item) {
+            throw "Notepad is not null";
         }
+        await Notepads.create({ id, email, title, content: text });
+        await Users.update({ lasttab: id }, { where: { email } });
+        
+        return res.sendStatus(201);
     } catch(e) {
         return res.sendStatus(400);
     }

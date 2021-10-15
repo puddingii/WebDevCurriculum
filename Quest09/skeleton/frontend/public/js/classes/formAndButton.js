@@ -185,7 +185,6 @@ export default class Notepad {
 			case "save":
 				actionOfBtn = async (e) => {
 					const noteData = textareaValue();
-					console.log(this.noteTextarea.noteId, this.noteTextarea.noteName,textareaForm.value)
 					const response = await this.myLocalStorage.saveContent(this.noteTextarea.noteId, this.#userEmail, this.noteTextarea.noteName, textareaForm.value);
 					if(response.status !== 201)  {
 						setTextlabelValue(`처리오류 - Response status code : ${response.status}`);
@@ -215,17 +214,16 @@ export default class Notepad {
 			case "saveAs":
 				actionOfBtn = async (e) => {
 					const noteData = textareaValue();
-					const saveAsInput = document.getElementById("saveAsInput").value;
-					const response = await this.myLocalStorage.saveAsContent(saveAsInput, textareaForm.value);
+					noteData.title = document.getElementById("saveAsInput").value;;
+					noteData.id = this.getLastItemId() + 1;
+					const response = await this.myLocalStorage.saveAsContent(noteData.id, this.#userEmail, noteData.title, textareaForm.value);
 					if(response.status !== 201)  {
 						setTextlabelValue(`처리오류 - Response status code : ${response.status}`);
 						return;
 					}
-					this.addDropdownItem(saveAsInput);
-					noteData.title = saveAsInput;
-					noteData.id = noteData.id + 1;
+					this.addDropdownItem(noteData.title);
 					this.#noteNameList.push(noteData);
-					this.addItemAtList(saveAsInput, noteData.id + 1);
+					this.addItemAtList(noteData.title, noteData.id);
 					setTextlabelValue("저장됨.");
 				}
 				break;

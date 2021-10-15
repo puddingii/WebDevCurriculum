@@ -5,7 +5,7 @@ import MySQLStore from "express-mysql-session";
 import homeRouter from "./routers/homeRouter.js";
 
 MySQLStore(session);
-const CLIENTPORT = 3000;
+const CLIENTPORT = 3500;
 
 const clientApp = express();
 const MysqlOptions = {

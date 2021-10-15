@@ -31,13 +31,13 @@ class MyLocalStorage {
 		return response;
 	}
 
-	async saveAsContent(title, text) {
+	async saveAsContent(id, email, title, text) {
 		const response = await fetch("http://localhost:8000/api/saveAs", {
 			method: "post",
 			headers: {
 				"Content-type": "application/json"
 			},
-			body: JSON.stringify({ title, text })
+			body: JSON.stringify({ id, email, title, text })
 		});
 		return response;
 	}

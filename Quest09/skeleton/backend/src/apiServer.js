@@ -7,7 +7,7 @@ const APIPORT = 8000;
 
 const apiApp = express();
 const corsOptions = {
-    origin: [/localhost:3000/],
+    origin: [/localhost:3500/],
 };
 
 const appSetting = (app) => {
