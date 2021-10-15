@@ -15,7 +15,7 @@ head
     .col-md-3.card.leftCard
       p Current id :
       p.card-text#currentUserId=userId
-      button.btn.btn-danger(type="button" onclick="location.href='/logout'") Log out
+      button.btn.btn-danger#logout(type="button") Log out
     .col-md-9
       .container.childContainer
         header
@@ -27,5 +27,6 @@ head
               ul.dropdown-menu#dropdownMenu(aria-labelledby='ddButton')
         br
         section.notepad
-script(src='/static/js/classes/manageStorage.js')
+script(src='/static/js/classes/manageStorage/notepadStorage.js')
+script(src='/static/js/classes/manageStorage/userStorage.js')
 script(type="module" src='/static/js/notepadLoader.js')

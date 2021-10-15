@@ -1,6 +1,6 @@
 import express from "express";
 import bcrypt from "bcrypt";
-import Users from "../../models/user";
+import Users from "../models/user";
 
 const userApi = express.Router();
 
@@ -19,6 +19,20 @@ userApi.route("/check").post( async(req, res) => {
         console.log(e);
         return res.sendStatus(400);
     }
+});
+
+userApi.route("/saveOpenNote").post( async(req, res) =>{
+    const { 
+        body: { email, opentab } 
+    } = req;
+    try {
+        await Users.update({ opentab },{ where: { email }});
+        return res.sendStatus(201);
+    } catch(e) {
+        console.log(e);
+        return res.sendStatus(400);
+    }
+    
 });
 
 export default userApi;

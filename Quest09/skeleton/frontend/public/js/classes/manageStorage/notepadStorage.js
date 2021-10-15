@@ -1,4 +1,4 @@
-class MyLocalStorage {
+class NotepadStorage {
 	constructor(id) {
 		this.currentUserId = id;
 	}

@@ -1,6 +1,6 @@
 import express from "express";
-import Users from "../../models/user";
-import Notepads from "../../models/notepad";
+import Users from "../models/user";
+import Notepads from "../models/notepad";
 const apiRouter = express.Router();
 
 // 저장 눌렀을 때 서버에 데이터 저장
