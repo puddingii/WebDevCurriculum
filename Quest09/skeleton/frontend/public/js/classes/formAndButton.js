@@ -6,6 +6,7 @@ import NoteTextarea from "./noteTextarea.js";
 export default class Notepad {
 	#noteNameList = [];
 	#userEmail;
+	#openTabs;
 	myLocalStorage = new MyLocalStorage();
 	textareaForm = document.getElementById("textareaForm");
 	noteFormDiv = document.getElementById("noteFormDiv");
@@ -34,6 +35,7 @@ export default class Notepad {
 	async initNotepad(currentUserId) {
 		const allData = await new MyLocalStorage(currentUserId).loadContent();
 		const { endTitle, openTab } = allData.pop();
+		this.#openTabs = openTab;
 		this.#userEmail = currentUserId;
 		this.noteTextarea.noteId = allData.length ? endTitle : "";
 		this.#noteNameList = allData;
@@ -74,7 +76,10 @@ export default class Notepad {
 			const currentId = parseInt(e.target.dataset.currentid);
 			const items = document.querySelectorAll(".notelink");
 
-			if(!this.navbarList.isItemInList(items, currentId)) this.addItemAtList(e.target.innerText, currentId);
+			if(!this.navbarList.isItemInList(items, currentId)) {
+				this.addItemAtList(e.target.innerText, currentId);
+				this.navbarList.toggleItem(`noteId${currentId}`, "a.notelink");
+			}
 			this.clickListAndSaveLog(currentId);
 			
 			const itemOfNavbar = this.getNoteById(currentId);
@@ -131,7 +136,6 @@ export default class Notepad {
 		this.setClickListEvent(item); // 클릭이벤트
 
 		this.navbarList.myList.appendChild(item);
-		this.navbarList.toggleItem(`noteId${id}`, "a.notelink");
 	}
 
 	// 파일 만들때 난수 생성해서 이름짓고 리스트추가(저장 안된상태)
@@ -147,6 +151,7 @@ export default class Notepad {
 				content: "",
 			});
 			this.addItemAtList(random, id);
+			this.navbarList.toggleItem(`noteId${id}`, "a.notelink");
 			this.clickListAndSaveLog(id);
 			this.noteTextarea.loadValue("textareaForm", "saveAsInput", random);
 		}
@@ -224,6 +229,7 @@ export default class Notepad {
 					this.addDropdownItem(noteData.title);
 					this.#noteNameList.push(noteData);
 					this.addItemAtList(noteData.title, noteData.id);
+					this.navbarList.toggleItem(`noteId${noteData.id}`, "a.notelink");
 					setTextlabelValue("저장됨.");
 				}
 				break;

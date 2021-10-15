@@ -5,3 +5,6 @@ import { MyWindow }  from "./classes/myWindow.js";
     const testWindow = new MyWindow(currentUserId);
     await testWindow.initMyWindow();
 })();
+$( function() {
+    $(".sortable").sortable();
+});

@@ -9,12 +9,13 @@ export class MyWindow {
 		const myNotepad = new Notepad();
 		await myNotepad.initNotepad(this.currentUserId);
 		const lastTabId = parseInt(myNotepad.noteTextarea.noteId);
-		const lastTabName = myNotepad.noteNameList.find((element) => element.id === lastTabId).title;
-		myNotepad.addItemAtList(lastTabName, lastTabId);
-
+		const lastTabName = myNotepad.getNoteById(lastTabId).title;
+		
 		const mainSection = document.querySelector("section.notepad");
 		myNotepad.setNotepadForm(mainSection);
 		myNotepad.clickNewFile();
+		myNotepad.addItemAtList(lastTabName, lastTabId);
+		myNotepad.navbarList.toggleItem(`noteId${lastTabId}`, "a.notelink");
 		myNotepad.noteNameList.forEach((note) => {
 			myNotepad.addDropdownItem(note.title, note.id);
 		});
