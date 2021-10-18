@@ -4,7 +4,6 @@ class UserStorage {
 	}
 
     async saveOpenNote(email, opentab, lasttab) {
-        console.log(opentab.toString());
         const response = await fetch("http://localhost:8000/api/users/saveOpenNote", {
             method: "post",
 			headers: {

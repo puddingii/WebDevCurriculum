@@ -1,5 +1,5 @@
-import DropdownList from "./dropdownItem.js";
-import NavBar from "./navBar.js";
+import DropdownList from "./manageList/dropdownItem.js";
+import NavBar from "./manageList/navBar.js";
 import NoteButton from "./noteButton.js";
 import NoteTextarea from "./noteTextarea.js";
 
@@ -14,7 +14,7 @@ export default class Notepad {
 	
 	// 데이터 가져온 뒤 private변수에 저장
     constructor() { 
-		this.noteTextarea = new NoteTextarea("");
+		this.noteTextarea = new NoteTextarea("textareaForm", "textareaLabel");
 		this.dropdownList = new DropdownList("dropdownMenu");
 		this.navbarList = new NavBar("navContainer");
 	}
@@ -95,7 +95,7 @@ export default class Notepad {
 			this.clickListAndSaveLog(currentId);
 			
 			const itemOfNavbar = this.getNoteById(currentId);
-			this.noteTextarea.loadValue("textareaForm", "saveAsInput", itemOfNavbar.title, itemOfNavbar.content);
+			this.noteTextarea.loadValue("saveAsInput", itemOfNavbar.title, itemOfNavbar.content);
 			this.setMonitorLabel();
 			this.noteTextarea.noteId = currentId;
 			this.noteTextarea.noteName = itemOfNavbar.title;
@@ -120,7 +120,7 @@ export default class Notepad {
 		this.noteTextarea.noteName = this.getNoteById().title;
 		
 		const getAfterValue = this.#noteNameList.findIndex((element) => element.id === currentid);
-		this.noteTextarea.loadValue("textareaForm", "saveAsInput", this.#noteNameList[getAfterValue].title, this.#noteNameList[getAfterValue].content);
+		this.noteTextarea.loadValue("saveAsInput", this.#noteNameList[getAfterValue].title, this.#noteNameList[getAfterValue].content);
 		this.setMonitorLabel();
 	}
 
@@ -176,7 +176,7 @@ export default class Notepad {
 			this.addItemAtList(random, id);
 			this.navbarList.toggleItem(`noteId${id}`, "a.notelink");
 			this.clickListAndSaveLog(id);
-			this.noteTextarea.loadValue("textareaForm", "saveAsInput", random);
+			this.noteTextarea.loadValue("saveAsInput", random);
 			this.setMonitorLabel();
 			this.#openTabs.push(id);
 		}
@@ -209,7 +209,7 @@ export default class Notepad {
 		}
 
 		let actionOfBtn;
-		switch(type) {  // 싹다 고쳐야함.
+		switch(type) { 
 			// 저장할 때 이벤트. 가르키고 있는 노트를 저장한 노트의 이름으로 바꾸고 드롭다운목록에 없다면 추가해줌. 
 			case "save":
 				actionOfBtn = async (e) => {
@@ -262,6 +262,8 @@ export default class Notepad {
 					this.navbarList.toggleItem(`noteId${noteData.id}`, "a.notelink");
 					this.setMonitorLabel("저장됨.");
 					this.#openTabs.push(noteData.id);
+					this.noteTextarea.noteId = noteData.id;
+					this.noteTextarea.noteName = textareaForm.value;
 				}
 				break;
 			// 닫을 때 이벤트

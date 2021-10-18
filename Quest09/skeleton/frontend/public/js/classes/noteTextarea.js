@@ -1,9 +1,11 @@
 export default class NoteTextarea {
-    #noteId;
-    #noteName;
-	constructor(noteId, noteName) {
-        this.#noteId = noteId;
-        this.#noteName = noteName;
+    #noteId = "";
+    #noteName = "";
+    #textareaId;
+    #labelId;
+	constructor(textareaId, labelId) {
+        this.#textareaId = textareaId;
+        this.#labelId = labelId;
     }
     get noteId() {
         return this.#noteId;
@@ -19,9 +21,9 @@ export default class NoteTextarea {
     }
 
     // textarea생성과 textarea처리를 위한 버튼 생성
-    monitorValue(textarea, labelId, text) {
+    monitorValue(textarea, text) {
         const handleTextarea = (e) => {
-            document.getElementById(labelId).innerText = text;
+            document.getElementById(this.#labelId).innerText = text;
         }
         textarea.addEventListener("input", handleTextarea);
     }
@@ -30,16 +32,16 @@ export default class NoteTextarea {
 	initArea(value = "") {
 		const noteArea = document.createElement("textarea");
 		noteArea.className = "form-control";
-        noteArea.id = "textareaForm";
+        noteArea.id = this.#textareaId;
         noteArea.value = value;
-		this.monitorValue(noteArea, "textareaLabel", "저장 안됨.");
+		this.monitorValue(noteArea, "저장 안됨.");
 
 		return noteArea;
 	}
 
 	// textarea value 설정
-	loadValue(textId, inputId, inputValue, textareaValue = "") {
-		const noteArea = document.getElementById(textId);
+	loadValue(inputId, inputValue, textareaValue = "") {
+		const noteArea = document.getElementById(this.#textareaId);
 		noteArea.value = textareaValue;
 
 		const saveAsInput = document.getElementById(inputId);

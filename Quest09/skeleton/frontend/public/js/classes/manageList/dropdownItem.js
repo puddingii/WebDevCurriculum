@@ -1,4 +1,4 @@
-import MyList from "./list.js";
+import MyList from "./myList.js";
 
 export default class DropdownList extends MyList {
     constructor(idOfList) {
@@ -22,7 +22,7 @@ export default class DropdownList extends MyList {
 		const dropdownList = document.getElementById(this.idOfList);
 		const dropdownItems = dropdownList.querySelectorAll("li");
 		dropdownItems.forEach((item) => { 
-			if(item.dataset.currentid === id) item.remove();
+			if(parseInt(item.dataset.currentid) === id) item.remove();
 		});
 	}
 }

@@ -17,7 +17,6 @@ apiRouter.route("/save").post( async(req, res) => {
         } else {
             await Notepads.create({ id, email, title, content: text });
         }
-        await Users.update({ lasttab: id }, { where: { email } });
         return res.sendStatus(201);
     } catch(e) {
         console.log(e);
@@ -32,7 +31,6 @@ apiRouter.route("/delete").delete( async(req, res) => {
     } = req;
     try {
         await Notepads.destroy({ where: { id: noteId, email } });
-        await Users.update({ lasttab: "" }, { where: { email } });
         return res.sendStatus(201);
     } catch(e) {
         console.log(e);
@@ -52,7 +50,6 @@ apiRouter.route("/saveAs").post( async(req, res) => {
             throw "Notepad is not null";
         }
         await Notepads.create({ id, email, title, content: text });
-        await Users.update({ lasttab: id }, { where: { email } });
 
         return res.sendStatus(201);
     } catch(e) {

@@ -1,4 +1,4 @@
-import MyList from "./list.js";
+import MyList from "./myList.js";
 
 export default class NavBar extends MyList {
     constructor(idOfList) {

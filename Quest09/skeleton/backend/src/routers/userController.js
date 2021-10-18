@@ -2,7 +2,6 @@ import express from "express";
 import bcrypt from "bcrypt";
 import Users from "../models/user";
 import Notepads from "../models/notepad";
-import e from "express";
 
 const userApi = express.Router();
 
