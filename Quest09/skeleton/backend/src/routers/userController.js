@@ -1,6 +1,8 @@
 import express from "express";
 import bcrypt from "bcrypt";
 import Users from "../models/user";
+import Notepads from "../models/notepad";
+import e from "express";
 
 const userApi = express.Router();
 
@@ -22,11 +24,20 @@ userApi.route("/check").post( async(req, res) => {
 });
 
 userApi.route("/saveOpenNote").post( async(req, res) =>{
-    const { 
-        body: { email, opentab } 
+    let { 
+        body: { email, opentab, lasttab } 
     } = req;
     try {
-        await Users.update({ opentab },{ where: { email }});
+        const queryResult = await Notepads.findAll({ where: { email } });
+        const notepads = JSON.parse(JSON.stringify(queryResult));
+        const opentabArr = opentab.split(',').filter((element) => {
+            return notepads.find((note) => note.id === parseInt(element));
+        });
+        if(!notepads.find((note) => note.id === lasttab)) {
+            lasttab = "";
+        }
+
+        await Users.update({ opentab: opentabArr.join(), lasttab },{ where: { email }});
         return res.sendStatus(201);
     } catch(e) {
         console.log(e);

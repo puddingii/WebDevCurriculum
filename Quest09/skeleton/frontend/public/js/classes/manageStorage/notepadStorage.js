@@ -9,13 +9,13 @@ class NotepadStorage {
 		return storage;
 	}
 
-	async deleteContent(id) {
+	async deleteContent(noteId, email) {
 		const response = await fetch("http://localhost:8000/api/delete", {
 			method: "delete",
 			headers: {
 				"Content-type": "application/json"
 			},
-			body: JSON.stringify({ id })
+			body: JSON.stringify({ noteId, email })
 		});
 		return response;
 	}

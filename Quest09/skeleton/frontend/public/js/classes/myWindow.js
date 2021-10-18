@@ -21,18 +21,16 @@ export class MyWindow {
 		});
 		this.myNotepad.navbarList.toggleItem(`noteId${lastTabId}`, "a.notelink");
 
-		// window.addEventListener("beforeunload", async() => {
-		// 	if(location.pathname === "/") {
-		// 		console.log(location.pathname)
-		// 		await this.myNotepad.saveOpenNote();
-		// 	}
-		// });
+		window.addEventListener("beforeunload", async() => {
+			if(location.pathname === "/") {
+				await this.myNotepad.saveOpenNote();
+			}
+		});
 	}
 
 	logout(btnId) {
 		const logoutBtn = document.getElementById(btnId);
 		const clickLogout = async () => {
-			// await this.myNotepad.saveOpenNote();
 			location.href = "/logout";
 		}
 		logoutBtn.addEventListener("click", clickLogout);

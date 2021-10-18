@@ -28,10 +28,10 @@ apiRouter.route("/save").post( async(req, res) => {
 // 삭제버튼을 눌렀을 때
 apiRouter.route("/delete").delete( async(req, res) => {
     const { 
-        body: { id } 
+        body: { noteId, email } 
     } = req;
     try {
-        await Notepads.destroy({ where: { id } });
+        await Notepads.destroy({ where: { id: noteId, email } });
         await Users.update({ lasttab: "" }, { where: { email } });
         return res.sendStatus(201);
     } catch(e) {

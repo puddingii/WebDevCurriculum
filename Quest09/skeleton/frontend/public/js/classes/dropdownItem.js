@@ -10,7 +10,7 @@ export default class DropdownList extends MyList {
 		const dropdownItems = dropdownMenu.querySelectorAll("a");
 		let isExisted = false;
 		dropdownItems.forEach((item) => { 
-			if(item.dataset.currentid === itemInfo.dataset.value) isExisted = true;
+			if(parseInt(item.dataset.currentid) === itemInfo.dataset.value) isExisted = true;
 		});
 		if(isExisted) return;
 

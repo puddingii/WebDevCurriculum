@@ -1,7 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import { sequelize } from "./dbInit";
 
-class Notepad extends Model {
+class Notepads extends Model {
   /**
    * Helper method for defining associations.
    * This method is not a part of Sequelize lifecycle.
@@ -12,7 +12,7 @@ class Notepad extends Model {
     // define association here
   }
 };
-Notepad.init({
+Notepads.init({
   id: {
     allowNull: false,
     primaryKey: true,
@@ -34,4 +34,4 @@ Notepad.init({
   timestamps: false,
 });
 
-export default Notepad;
+export default Notepads;
