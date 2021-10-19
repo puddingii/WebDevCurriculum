@@ -34,7 +34,10 @@ export default class Notepad {
 	getNoteById(noteId = this.noteTextarea.noteId) {
 		return this.#noteNameList.find((element) => element.id === noteId);
 	}
-	// 데이터 불러오는 초기화함수 *
+	getNoteIndexById(noteId = this.noteTextarea.noteId) {
+		return this.#noteNameList.findIndex((element) => element.id === noteId);
+	}
+	// 데이터 불러오는 초기화함수
 	async initNotepad(currentUserId) {
 		const allData = await new NotepadStorage(currentUserId).loadContent();
 		const { endTitle, openTab } = allData.pop();
@@ -250,21 +253,17 @@ export default class Notepad {
 				actionOfBtn = async (e) => {
 					const noteData = textareaValue();
 					noteData.title = document.getElementById("saveAsInput").value;;
-					noteData.id = this.getLastItemId() + 1;
-					const response = await this.notepadStorage.saveAsContent(noteData.id, this.#userEmail, noteData.title, textareaForm.value);
-					if(response.status !== 201)  {
+					const response = await this.notepadStorage.saveAsContent(this.#userEmail, noteData.title, textareaForm.value);
+					if(response.status === 400)  {
 						this.setMonitorLabel(`처리오류 - Response status code : ${response.status}`);
 						return;
 					}
+					noteData.id = response.noteId;
 					this.addDropdownItem(noteData.title);
 					this.#noteNameList.push(noteData);
 					this.addItemAtList(noteData.title, noteData.id);
 					this.clickListAndSaveLog(noteData.id);
-					// this.navbarList.toggleItem(`noteId${noteData.id}`, "a.notelink");
-					// this.setMonitorLabel("저장됨.");
 					this.#openTabs.push(noteData.id);
-					// this.noteTextarea.noteId = noteData.id;
-					// this.noteTextarea.noteName = textareaForm.value;
 				}
 				break;
 			// 닫을 때 이벤트

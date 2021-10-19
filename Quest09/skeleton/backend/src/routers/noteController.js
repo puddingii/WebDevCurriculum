@@ -1,7 +1,9 @@
 import express from "express";
 import Users from "../models/user";
 import Notepads from "../models/notepad";
+import JsonManage from "./util/jsonManage";
 const apiRouter = express.Router();
+const jsonManage = new JsonManage();
 
 // 저장 눌렀을 때 서버에 데이터 저장
 apiRouter.post("/save", async(req, res) => {
@@ -41,18 +43,18 @@ apiRouter.delete("/delete", async(req, res) => {
 // 다른이름으로 저장을 눌렀을 때
 apiRouter.post("/saveAs", async(req, res) => {
     const { 
-        body: { id, email, text, title } 
+        body: { email, title, text } 
     } = req;
 
     try {
-        const item = await Notepads.findOne({ where: { id }});
+        const item = await Notepads.findOne({ where: { email, title }});
         if(item) {
             throw "Notepad is not null";
         }
-        await Notepads.create({ id, email, title, content: text });
-
-        return res.sendStatus(201);
+        const noteInfo = await Notepads.create({ email, title, content: text });
+        return res.status(201).json({ noteId: jsonManage.classToTextToJson(noteInfo).id });
     } catch(e) {
+        console.log(e);
         return res.sendStatus(400);
     }
 });
@@ -66,7 +68,7 @@ apiRouter.get("/loadAllData", async(req, res) => {
         const userInfo = await Users.findOne({ where: { email }});
         const notepadInfo = await Notepads.findAll({ where: { email }});
         notepadInfo.push({ endTitle: userInfo.getLasttab(), openTab: userInfo.getOpentab() });
-        const data = JSON.parse(JSON.stringify(notepadInfo, null, 2));
+        const data = jsonManage.classToTextToJson(notepadInfo);
         
         return res.status(200).json(data);
     } catch(e) {

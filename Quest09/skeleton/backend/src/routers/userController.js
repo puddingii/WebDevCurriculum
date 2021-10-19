@@ -2,6 +2,8 @@ import express from "express";
 import bcrypt from "bcrypt";
 import Users from "../models/user";
 import Notepads from "../models/notepad";
+import JsonManage from "./util/jsonManage";
+const jsonManage = new JsonManage();
 
 const userApi = express.Router();
 
@@ -28,7 +30,7 @@ userApi.post("/saveOpenNote", async(req, res) =>{
     } = req;
     try {
         const queryResult = await Notepads.findAll({ where: { email } });
-        const notepads = JSON.parse(JSON.stringify(queryResult));
+        const notepads = jsonManage.classToTextToJson(queryResult);
         const opentabArr = opentab.split(',').filter((element) => {
             return notepads.find((note) => note.id === parseInt(element));
         });

@@ -34,7 +34,7 @@ export class MyWindow {
 
 	logout(btnId) {
 		const logoutBtn = document.getElementById(btnId);
-		const clickLogout = async () => {
+		const clickLogout = () => {
 			location.href = "/logout";
 		}
 		logoutBtn.addEventListener("click", clickLogout);

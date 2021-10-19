@@ -7,6 +7,9 @@ class Users extends Model {
    * This method is not a part of Sequelize lifecycle.
    * The `models/index` file will call this method automatically.
    */
+  getId() {
+    return this.id;
+  }
   getOpentab() {
     return this.opentab;
   }
