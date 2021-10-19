@@ -5,7 +5,7 @@ import Notepads from "../models/notepad";
 
 const userApi = express.Router();
 
-userApi.route("/check").post( async(req, res) => {
+userApi.post("/check", async(req, res) => {
     const { 
         body: { loginId: email, loginPassword: passwd } 
     } = req;
@@ -22,7 +22,7 @@ userApi.route("/check").post( async(req, res) => {
     }
 });
 
-userApi.route("/saveOpenNote").post( async(req, res) =>{
+userApi.post("/saveOpenNote", async(req, res) =>{
     let { 
         body: { email, opentab, lasttab } 
     } = req;
@@ -37,6 +37,24 @@ userApi.route("/saveOpenNote").post( async(req, res) =>{
         }
 
         await Users.update({ opentab: opentabArr.join(), lasttab },{ where: { email }});
+        return res.sendStatus(201);
+    } catch(e) {
+        console.log(e);
+        return res.sendStatus(400);
+    }
+});
+
+userApi.post("/join", async(req, res) =>{
+    let { 
+        body: { loginId, password } 
+    } = req;
+    try {
+        const isExisted = await Users.findOne({ where: { email: loginId } });
+        if(isExisted) {
+            return res.sendStatus(400);
+        }
+        const hashPassword = await bcrypt.hash(password, 10);
+        await Users.create({ email: loginId, password: hashPassword });
         return res.sendStatus(201);
     } catch(e) {
         console.log(e);

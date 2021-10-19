@@ -24,14 +24,20 @@ class Users extends Model {
   }
 };
 Users.init({
-  email: {
-    type: DataTypes.STRING,
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
     allowNull: false,
     primaryKey: true
   },
-  password: {
+  email: {
+    type: DataTypes.STRING,
     allowNull: false,
-    type: DataTypes.STRING
+    unique: true
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
   },
   opentab: DataTypes.STRING,
   lasttab: DataTypes.STRING

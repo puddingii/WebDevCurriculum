@@ -32,8 +32,8 @@ body {
   border-bottom-left-radius: 0;
 }
 
-.form-signin input[type="password"] {
-  margin-bottom: 10px;
+.form-signin input[name="loginPassword2"] {
+
   border-top-left-radius: 0;
   border-top-right-radius: 0;
 }
@@ -41,4 +41,8 @@ body {
 .errorMsg {
   font-size: 15px;
 	color: red;
+}
+
+button {
+  margin-top: 10px;
 }

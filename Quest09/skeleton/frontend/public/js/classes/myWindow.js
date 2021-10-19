@@ -13,13 +13,17 @@ export class MyWindow {
 		const mainSection = document.querySelector("section.notepad");
 		this.myNotepad.setNotepadForm(mainSection);
 		this.myNotepad.clickNewFile();
-		this.myNotepad.openTabs.forEach((tab) => {
-			this.myNotepad.addItemAtList(this.myNotepad.getNoteById(parseInt(tab)).title, tab);
-		})
-		this.myNotepad.noteNameList.forEach((note) => {
-			this.myNotepad.addDropdownItem(note.title, note.id);
-		});
-		this.myNotepad.navbarList.toggleItem(`noteId${lastTabId}`, "a.notelink");
+		if(this.myNotepad.openTabs) {
+			this.myNotepad.openTabs.forEach((tab) => {
+				this.myNotepad.addItemAtList(this.myNotepad.getNoteById(parseInt(tab)).title, tab);
+			});
+			this.myNotepad.navbarList.toggleItem(`noteId${lastTabId}`, "a.notelink");
+		}
+		if(this.myNotepad.noteNameList) {
+			this.myNotepad.noteNameList.forEach((note) => {
+				this.myNotepad.addDropdownItem(note.title, note.id);
+			});
+		}
 
 		window.addEventListener("beforeunload", async() => {
 			if(location.pathname === "/") {

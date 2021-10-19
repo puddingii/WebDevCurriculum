@@ -4,18 +4,18 @@ import Notepads from "../models/notepad";
 const apiRouter = express.Router();
 
 // 저장 눌렀을 때 서버에 데이터 저장
-apiRouter.route("/save").post( async(req, res) => {
+apiRouter.post("/save", async(req, res) => {
     const { 
         body: { id, email, title, text } 
     } = req;
 
     try { 
         const user = await Users.findOne({ where: { email } });
-        const note = await Notepads.findOne({ where: { id }});
+        const note = await Notepads.findOne({ where: { id, email }});
         if(note && user) {
             await Notepads.update({ content: text },{ where: { id } });
         } else {
-            await Notepads.create({ id, email, title, content: text });
+            await Notepads.create({ email, title, content: text });
         }
         return res.sendStatus(201);
     } catch(e) {
@@ -25,7 +25,7 @@ apiRouter.route("/save").post( async(req, res) => {
 });
 
 // 삭제버튼을 눌렀을 때
-apiRouter.route("/delete").delete( async(req, res) => {
+apiRouter.delete("/delete", async(req, res) => {
     const { 
         body: { noteId, email } 
     } = req;
@@ -39,7 +39,7 @@ apiRouter.route("/delete").delete( async(req, res) => {
 });
 
 // 다른이름으로 저장을 눌렀을 때
-apiRouter.route("/saveAs").post( async(req, res) => {
+apiRouter.post("/saveAs", async(req, res) => {
     const { 
         body: { id, email, text, title } 
     } = req;
@@ -58,7 +58,7 @@ apiRouter.route("/saveAs").post( async(req, res) => {
 });
 
 // 모든 데이터 불러오기
-apiRouter.route("/loadAllData").get( async(req, res) => {
+apiRouter.get("/loadAllData", async(req, res) => {
     try {
         const { 
             query: { email }
