@@ -7,6 +7,7 @@ export default class Notepad {
 	#noteNameList = new Array();
 	#userEmail = "";
 	#openTabs;
+	newFileCnt = 0;
 	notepadStorage = new NotepadStorage();
 	userStorage = new UserStorage();
 	textareaForm = document.getElementById("textareaForm");
@@ -28,9 +29,6 @@ export default class Notepad {
 	get openTabs() {
 		return this.#openTabs;
 	}
-	getLastItemId() {
-		return this.#noteNameList.length ? this.#noteNameList[this.#noteNameList.length-1].id : 0;
-	}
 	getNoteById(noteId = this.noteTextarea.noteId) {
 		return this.#noteNameList.find((element) => element.id === noteId);
 	}
@@ -50,6 +48,7 @@ export default class Notepad {
 		this.#noteNameList.sort((a, b) => a.id - b.id);
 	}
 
+	// textarea의 변경이 감지되었을 때 label을 재설정해주는 함수.
 	setMonitorLabel(labelValue, idOfLabel= "textareaLabel") {
 		const label = document.getElementById(idOfLabel);
 		const current = this.getNoteById();
@@ -57,7 +56,7 @@ export default class Notepad {
 		else label.innerText = current.isSaved ? "저장됨." : "저장 안됨.";
 	}
 
-    // Dropdown에 아이템 추가
+    // Dropdown에 아이템과 아이템이벤트 추가
 	addDropdownItem(value, currentId) { 
 		const itemInfo = {
 			className: "",
@@ -90,26 +89,18 @@ export default class Notepad {
 			const currentId = parseInt(e.target.dataset.currentid);
 			const items = document.querySelectorAll(".notelink");
 
+			// navBar에 없을 시 navBar에 추가
 			if(!this.navbarList.isItemInList(items, currentId)) {
 				this.addItemAtList(e.target.innerText, currentId);
-				this.navbarList.toggleItem(`noteId${currentId}`, "a.notelink");
-				this.#openTabs.push(currentId);
 			}
 			this.clickListAndSaveLog(currentId);
-			
-			const itemOfNavbar = this.getNoteById(currentId);
-			this.noteTextarea.loadValue("saveAsInput", itemOfNavbar.title, itemOfNavbar.content);
-			this.setMonitorLabel();
-			this.noteTextarea.noteId = currentId;
-			this.noteTextarea.noteName = itemOfNavbar.title;
 		}
-
 		item.addEventListener("click", handleLoadValue);
 	}
 
-	// 리스트에 있는 아이템 클릭시 기존에 적어둔 값 저장, 클릭한 리스트의 값 표시 
+	// 리스트에 있는 아이템 클릭시 기존에 적어둔 값 저장, 클릭한 리스트의 값 표시, 현재 가르키고 있는 note갱신
 	clickListAndSaveLog(clickedId) {
-		const getBeforeValue = this.#noteNameList.findIndex((element) => element.id === this.noteTextarea.noteId);
+		const getBeforeValue = this.getNoteIndexById();
 		noteFormDiv.classList.remove("disNone");
 
 		if(getBeforeValue !== -1) {
@@ -121,10 +112,12 @@ export default class Notepad {
 		this.navbarList.toggleItem(`noteId${clickedId}`, "a.notelink");
 		this.noteTextarea.noteId = clickedId; // 클릭한 거 가르키기
 		this.noteTextarea.noteName = this.getNoteById().title;
+		if(!this.#openTabs.find(element => element === clickedId)) this.#openTabs.push(clickedId);
 		
-		const getAfterValue = this.#noteNameList.findIndex((element) => element.id === clickedId);
+		const getAfterValue = this.getNoteIndexById(clickedId);
 		this.noteTextarea.loadValue("saveAsInput", this.#noteNameList[getAfterValue].title, this.#noteNameList[getAfterValue].content);
 		this.setMonitorLabel();
+		console.log(this.#openTabs);
 	}
 
 	// 리스트 클릭 이벤트등록
@@ -163,12 +156,12 @@ export default class Notepad {
 		this.navbarList.myList.appendChild(item);
 	}
 
-	// 파일 만들때 난수 생성해서 이름짓고 리스트추가(저장 안된상태)
+	// 파일 만들때 난수 생성해서 이름짓고 리스트추가(저장 안된상태) id값 수정필요함.
 	clickNewFile() {
 		const openBtn = document.getElementById("openFile");
 		const handleNewFile = (e) => {
 			const random = `tmp${Math.floor(Math.random()*1000000+1)}`;
-			const id = this.getLastItemId() + 1;
+			const id = `${newFileCnt}`;
 			this.#noteNameList.push({
 				id,
 				email: this.#userEmail,
@@ -181,7 +174,6 @@ export default class Notepad {
 			this.clickListAndSaveLog(id);
 			this.noteTextarea.loadValue("saveAsInput", random);
 			this.setMonitorLabel();
-			this.#openTabs.push(id);
 		}
 		openBtn.addEventListener("click", handleNewFile);
 	}
@@ -223,7 +215,7 @@ export default class Notepad {
 						return;
 					}
 					this.addDropdownItem(noteData.title, noteData.id); // dropdown목록 확인후 추가
-					const indexOfItem = this.#noteNameList.findIndex((element) => element.id === this.noteTextarea.noteId);
+					const indexOfItem = this.getNoteIndexById();
 					if(indexOfItem !== -1) {
 						this.#noteNameList[indexOfItem] = noteData;
 					} else {
@@ -263,7 +255,6 @@ export default class Notepad {
 					this.#noteNameList.push(noteData);
 					this.addItemAtList(noteData.title, noteData.id);
 					this.clickListAndSaveLog(noteData.id);
-					this.#openTabs.push(noteData.id);
 				}
 				break;
 			// 닫을 때 이벤트
